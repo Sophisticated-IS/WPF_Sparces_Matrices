@@ -10,13 +10,15 @@ namespace WpfApp1
 {
     public partial class MainWindow
     {
+      
+
         public MainWindow()
         {
             InitializeComponent();
      
             double[,] m_intArray = new double[21, 20];
             string[,] str_arr = new string[50, 50];
-
+            string[,] str_arr2 = new string[50, 50];
             //for (int i = 0; i < 15; i++)
             //{
             //    for (int j = 0; j < 19; j++)
@@ -28,9 +30,14 @@ namespace WpfApp1
             //m_intArray[20, 19] = 56767454.98798976587;
             //dataGrid2D.ItemsSource2D = m_intArray;
             dataGrid2D.ItemsSource2D = str_arr;
+            dataGrid2D_sec_page.ItemsSource2D = str_arr2;
+            ComboBox_orientation.SelectedIndex = 0;
+            comboBox_name.SelectedIndex = 0;
+            ComboBox_common_elts.SelectedIndex = 0;
 
         }
 
+        
     }                     
 }                       
                          

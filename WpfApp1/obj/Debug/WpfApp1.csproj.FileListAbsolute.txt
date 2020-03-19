@@ -20,9 +20,8 @@ C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\WpfApp1.exe
 C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\WpfApp1.pdb
 C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\App.baml
 C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\MaterialDesignColors.dll
-C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\MaterialDesignThemes.Wpf.dll
 C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\MaterialDesignColors.pdb
-C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\MaterialDesignThemes.Wpf.pdb
-C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\MaterialDesignThemes.Wpf.xml
 C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\Gu.Wpf.DataGrid2D.dll
 C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\Gu.Wpf.DataGrid2D.xml
+C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\WpfApp1_MarkupCompile.lref
