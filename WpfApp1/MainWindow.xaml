@@ -5,11 +5,11 @@
                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                           xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                           xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
-                          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                          xmlns:local="clr-namespace:WpfApp1"
-                          x:Class="WpfApp1.MainWindow"
+                          xmlns:local="clr-namespace:Wpf_Matrices"
+                          x:Class="Wpf_Matrices.MainWindow"
                           xmlns:dg2d="clr-namespace:DataGrid2DLibrary;assembly=DataGrid2DLibrary"
-                          mc:Ignorable ="d"
+    xmlns:interactivity="http://schemas.microsoft.com/expression/2010/interactivity"
+    mc:Ignorable ="d"
                           Title="Работай с удовольствием с Fast_Matrix"
                           d:DesignHeight ="600"
                           d:DesignWidth="800"
@@ -18,49 +18,7 @@
                           >
 
     <controls:MetroWindow.Resources>
-        <Style x:Key="FontStyleExp">
-            <Setter Property= "Control.FontSize" Value = "14" />
-
-        </Style>
-        <Style TargetType="{x:Type controls:MetroTabItem}" x:Key ="TabPageTemplate" >
-            <Setter Property="Background" Value="Blue"/>
-            <Setter Property="Foreground" Value="BlueViolet"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-        </Style>
-        <Style x:Key="CircleButton" TargetType="Button">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ButtonBase}">
-                        <Border x:Name="border" CornerRadius="1000" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="Button.IsDefaulted" Value="True">
-                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" TargetName="border" Value="#FFBEE6FD"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="#FF3C7FB1"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" TargetName="border" Value="#FFC4E5F6"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="#FF2C628B"/>
-                            </Trigger>
-                            <Trigger Property="ToggleButton.IsChecked" Value="True">
-                                <Setter Property="Background" TargetName="border" Value="#FFBCDDEE"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="#FF245A83"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" TargetName="border" Value="#FFF4F4F4"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="#FFADB2B5"/>
-                                <Setter Property="Foreground" Value="#FF838383"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+       
         <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
             <Grid x:Name="gd">
                 <Grid.ColumnDefinitions>
@@ -147,7 +105,36 @@
             </Style.Triggers>
         </Style>
 
+<!--$$$$$$$$$$$$$$$$$-        МОИ СТИЛИ САМ ПИСАЛ ОТВЕЧАЮ            -$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
+
+
+        <Style TargetType="controls:MetroTabItem" >
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#FFFFCF73"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         
+        <Style TargetType="TabItem" >
+            <Setter Property="Background" Value="#FFFFCF73"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Style.Triggers>
+             
+            </Style.Triggers>
+        </Style>
+        
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1" x:Key="ExpanderGradientbrush">
+            <GradientStop Color="BlanchedAlmond" Offset="0"/>
+            <GradientStop Color="Blue" Offset="0.2"/>
+            <GradientStop Color="BlanchedAlmond" Offset="0.35"/>
+
+            <GradientStop Color="White" Offset="0.65"/>
+            <GradientStop Color="Blue" Offset="0.8"/>
+
+            <GradientStop Color="BlanchedAlmond" Offset="1"/>
+        </LinearGradientBrush>
     </controls:MetroWindow.Resources>
    
 
@@ -155,7 +142,7 @@
 
         <controls:MetroTabControl BorderBrush="#FFFFBE40" BorderThickness="5" controls:TabControlHelper.UnderlineBrush="#FF4573D5" controls:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="True" >
 
-            <controls:MetroTabItem    Header="Вычисление выражения" Background="#FFFFCF73" controls:TabControlHelper.UnderlineMouseOverSelectedBrush="#FF4573D5" >
+            <controls:MetroTabItem    Header="Вычисление выражения"  controls:TabControlHelper.UnderlineMouseOverSelectedBrush="#FF4573D5" >
                 <Grid Background="#FF4573D5">
 
                     <Grid.RowDefinitions>
@@ -191,8 +178,8 @@
                                         </Run>
                                 </TextBlock>
 
-                                <controls:MetroAnimatedSingleRowTabControl FontFamily="times new roman" Margin="0,0,0,3" >
-                                    <TabItem Header="Выбор матрицы" Background="#FFFFCF73">
+                                <controls:MetroAnimatedSingleRowTabControl FontFamily="times new roman" Margin="0,0,0,3"  >
+                                    <TabItem  Header="Выбор матрицы" >
                                         <TabItem.Content>
                                             <Border  BorderThickness="3" BorderBrush="#FFFFBE40" Background="#FFFFBE40">
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
@@ -275,7 +262,9 @@
                             </Grid>
                             <Grid Grid.Column="2" HorizontalAlignment="Right">
 
-                                <Button MinWidth="10" Content="📂" FontStretch="UltraCondensed"  FontSize="25" FontWeight="Bold" Background="#FFFFCF73"/>
+                                <Button MinWidth="10" Content="📂" FontStretch="UltraCondensed" 
+                                        FontSize="25" FontWeight="Bold" Background="#FFFFCF73"
+                                        Click="Save_Matrix_Dialog"/>
 
                             </Grid>
 
@@ -292,7 +281,7 @@
 
             </controls:MetroTabItem>
 
-            <controls:MetroTabItem Header="Добавление матрицы" Margin="5,0,0,0 " >
+            <controls:MetroTabItem Header="Добавление матрицы" Margin="5,0,0,0 "  >
                 <Grid   Background="#FF4573D5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
@@ -300,7 +289,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" MaxWidth="400">
-                        <Expander ExpandDirection="Right" BorderThickness="3" Background="White" BorderBrush="#FFFFBE40">
+                        <Expander ExpandDirection="Right" BorderThickness="3" Background="{StaticResource ExpanderGradientbrush}" BorderBrush="#FFFFBE40">
                             <Expander.Header>
                                 <Label Content="Характеристики матрицы" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="Black">
                                     <Label.LayoutTransform>
@@ -316,28 +305,28 @@
                                         <Border BorderBrush="Gray" BorderThickness="3">
                                             <StackPanel>
                                                 <TextBlock Text="Размер" FontSize="16" FontWeight="Bold"/>
-                                                <controls:NumericUpDown FontSize="20">
-
-                                                </controls:NumericUpDown>
+                                                <controls:NumericUpDown Value="0" FontSize="20" NumericInputMode="Numbers" TrackMouseWheelWhenMouseOver="True" Maximum="100000" Minimum="0"/>
                                                 <Button Content="Авто заполнение" FontSize="20" Background="#FFFFBE40"/>
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="Ориентация:" FontSize="16" FontWeight="Bold" />
-                                                    <Button Margin="5,0,0,0">
+                                                    <Button Margin="5,0,0,0" Click="Button_Orientation_Click">
                                                         <Button.Content>
-                                                            <Image Source="C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\ОР.png" Width="50"/>
+                                                            <Image  x:Name="Image_OR" Source="C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\ОР.png" Width="50"/>
                                                         </Button.Content>
+                                                        
                                                     </Button>
                                                 </StackPanel>
                                                 <TextBlock Text="Значение однотипных элементов" TextDecorations="Underline" FontSize="16" FontWeight="Bold"/>
-                                                <TextBox Text="0" FontSize="20" />
+                                                <TextBox Text="0" FontSize="20" MaxLength="50"/>
+
                                             </StackPanel>
                                         </Border>
                                     </StackPanel>
                                     <Border Margin="0,3,0,0" BorderBrush="Gray" BorderThickness="3">
                                         <StackPanel>
                                             <Button Content="Добавить матрицу" FontSize="20" Background="#FFFFBE40"/>
-                                            <Button  Content="Открыть уже существующую" FontSize="20" Background="#FFBF7930"/>
-                                            <Button Content="Сохранить как" FontSize="20" Background="#FFFFBE40"/>
+                                            <Button  Content="Открыть уже существующую" FontSize="20" Background="#FFBF7930" Click="Button_Open_existing_Matrix_Click"/>
+                                            <Button Content="Сохранить как" FontSize="20" Background="#FFFFBE40" Click="Button_save_as_left_expander_Click"/>
                                             <Button Content="Удалить из списка" FontSize="20" Background="#FFBF7930"/>
                                         </StackPanel>
                                     </Border>
@@ -362,18 +351,18 @@
                         </Grid>
                         <Grid Grid.Row="2">
                             <StackPanel  Orientation="Horizontal">
-                                <TextBlock FontWeight="Bold" Text="Представление:"/>
-                                <TabControl BorderThickness="0" Background="White">
-                                    <TabItem Header="Обычное" OverridesDefaultStyle="True" FontSize="19" controls:ControlsHelper.HeaderFontStretch="Expanded" controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold" Background="#FFFFCF73" />
+                                <TextBlock Margin="0,0,3,0" FontWeight="Bold" FontSize="20" Text="Представление:"/>
+                                <controls:MetroAnimatedSingleRowTabControl BorderThickness="0" Background="White">
+                                    <TabItem Header="Обычное"  FontSize="19"  controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold" Background="#FFFFCF73" />
                                     <TabItem Header="Упакованное" controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold"/>
                                     <TabItem Header="С адресами" controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold"/>
-                                </TabControl>
+                                </controls:MetroAnimatedSingleRowTabControl>
                             </StackPanel>
                         </Grid>
                     </Grid>
 
                     <Grid Grid.Column="2" MaxWidth="250">
-                        <Expander ExpandDirection="Left" BorderThickness="3" Background="White" Foreground="Black" BorderBrush="#FFFFBE40" controls:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="True">
+                        <Expander ExpandDirection="Left" BorderThickness="3" Background="{StaticResource ExpanderGradientbrush}" Foreground="Black" BorderBrush="#FFFFBE40" controls:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="True">
                             <Expander.Header>
                                 <Label Content="Выбор матрицы" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="Black">
                                     <Label.LayoutTransform>

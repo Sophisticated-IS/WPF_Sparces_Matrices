@@ -1,4 +1,6 @@
-﻿namespace WpfApp1
+﻿using System.Collections.Generic;
+
+namespace Wpf_Matrices
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -10,6 +12,6 @@
     }
     public partial class App
     {
-      
+        
     }
 }
