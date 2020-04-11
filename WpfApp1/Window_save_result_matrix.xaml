@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApp1"
-        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" x:Class="WpfApp1.Window_save_result_matrix"
+    x:Class="WpfApp1.Window_save_result_matrix"
         mc:Ignorable="d"
         Title="Сохранить результат вычислений как" Height="220" Width="400"
         Background="AliceBlue" BorderBrush="#FF4573D5" BorderThickness="3" ResizeMode="NoResize" HorizontalAlignment="Center" WindowStartupLocation="CenterScreen">
@@ -24,7 +23,9 @@
             <TextBlock Text="Название матрицы:"/>
             <TextBox x:Name="Text_Box_Matrix_name"/>
             <TextBlock Text="Путь:"/>
-            <TextBox x:Name="Text_Box_Path" MouseDoubleClick="TextBox_MouseDoubleClick" />
+            <TextBox x:Name="Text_Box_Path" MouseDoubleClick="TextBox_MouseDoubleClick" Text="!двойной клик выбор пути!" Foreground="Gray" TextAlignment="Center">
+            </TextBox>
+            
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                 <CheckBox  BorderBrush="Black" Foreground="Green"/>
                 <TextBlock Text="Добавить матрицу в список для дальнейшей работы" />

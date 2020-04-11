@@ -42,8 +42,11 @@ namespace WpfApp1
 
             if (result == true)
             {
+                Text_Box_Path.Foreground = Brushes.Black; 
                 Text_Box_Path.Text = dlg.FileName;
+                
             }
+
         }
     }
 }

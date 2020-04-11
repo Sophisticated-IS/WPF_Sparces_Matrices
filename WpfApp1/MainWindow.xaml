@@ -6,9 +6,11 @@
                           xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                           xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
                           xmlns:local="clr-namespace:Wpf_Matrices"
-                          x:Class="Wpf_Matrices.MainWindow"
                           xmlns:dg2d="clr-namespace:DataGrid2DLibrary;assembly=DataGrid2DLibrary"
+    xmlns:Converter="clr-namespace:WpfApp1"
     xmlns:interactivity="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:dataGrid2D="http://gu.se/DataGrid2D"
+                          x:Class="Wpf_Matrices.MainWindow"
     mc:Ignorable ="d"
                           Title="Работай с удовольствием с Fast_Matrix"
                           d:DesignHeight ="600"
@@ -18,8 +20,9 @@
                           >
 
     <controls:MetroWindow.Resources>
-       
-        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
+        <Converter:MatrixToDataViewConverter x:Key="MatrixToDataViewConverter"/>
+
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
             <Grid x:Name="gd">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -28,14 +31,14 @@
                 <Border x:Name="Border" SnapsToDevicePixels="True" Grid.ColumnSpan="2" Background="White" BorderBrush="Black" BorderThickness="1"/>
                 <Border x:Name="Boredr1" SnapsToDevicePixels="True" Grid.Column="1"  Margin="1" Background="LightGoldenrodYellow" BorderBrush="Black" BorderThickness="0,0,1,0" />
                 <Path x:Name="Arrow" SnapsToDevicePixels="True" Grid.Column="1" Fill="#FFD4D040" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 6 6 L 12 0 Z"/>
-                <ContentPresenter Grid.Column="0" TextElement.Foreground="Orange"></ContentPresenter>
+                <ContentPresenter Grid.Column="0" TextElement.Foreground="Orange"/>
             </Grid>
             <ControlTemplate.Triggers>
-                <Trigger Property="ToggleButton.IsMouseOver" Value="True">
+                <Trigger Property="IsMouseOver" Value="True">
                     <Setter TargetName="Border" Property="BorderBrush" Value="Black"/>
                     <Setter TargetName="Boredr1" Property="BorderBrush" Value="Black"/>
                 </Trigger>
-                <Trigger Property="ToggleButton.IsChecked" Value="True">
+                <Trigger Property="IsChecked" Value="True">
                     <Setter TargetName="Arrow" Property="Data" Value="M 0 0 L 5 5 L 10 0"/>
                     <Setter TargetName="Arrow" Property="Fill" Value="White"/>
                     <Setter TargetName="Arrow" Property="Stroke" Value="White"/>
@@ -48,26 +51,24 @@
         </ControlTemplate>
 
         <!--TextBox Template-->
-        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="TextBox">
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
             <ScrollViewer x:Name="PART_ContentHost" Focusable="False" />
         </ControlTemplate>
 
         <!--combobox-->
-        <Style x:Key="combobox_style" TargetType="ComboBox">
+        <Style x:Key="combobox_style" TargetType="{x:Type ComboBox}">
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate  TargetType="ComboBox">
+                    <ControlTemplate  TargetType="{x:Type ComboBox}">
                         <Grid>
-                            <ToggleButton Name="ToggleButton" Foreground="Black" Template="{StaticResource ComboBoxToggleButton}" Focusable="false" IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press">
-                            </ToggleButton>
-                            <ContentPresenter Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="3,3,23,3"  VerticalAlignment="Center" HorizontalAlignment="Left" />
+                            <ToggleButton x:Name="ToggleButton" Foreground="Black" Template="{StaticResource ComboBoxToggleButton}" Focusable="false" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"/>
+                            <ContentPresenter x:Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="3,3,23,3"  VerticalAlignment="Center" HorizontalAlignment="Left" />
                             <TextBox OverridesDefaultStyle="True" SelectionBrush="Gray" CaretBrush="Black" Margin="0,0,30,0" TextWrapping="NoWrap"   x:Name="PART_EditableTextBox" FontFamily="Segoe UI Dark"   Foreground="Black" Style="{x:Null}" Template="{StaticResource ComboBoxTextBox}" HorizontalAlignment="Left" Focusable="True"  VerticalAlignment="Center"  FontSize="15"   Visibility="Hidden" IsReadOnly="{TemplateBinding IsReadOnly}"/>
-                            <Popup Name="Popup"  Grid.ColumnSpan="2" Placement="Bottom"  IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
-                                <Grid Name="DropDown"   SnapsToDevicePixels="True" MaxWidth="{TemplateBinding ActualWidth}" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                            <Popup x:Name="Popup"  Grid.ColumnSpan="2" Placement="Bottom"  IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Grid x:Name="DropDown"   SnapsToDevicePixels="True" MaxWidth="{TemplateBinding ActualWidth}" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                     <Border Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="DropDownBorder" SnapsToDevicePixels="True" Background="Transparent" MaxWidth="{TemplateBinding ActualWidth}" BorderThickness="1" BorderBrush="Black"/>
                                     <ScrollViewer Grid.ColumnSpan="2" ScrollViewer.CanContentScroll="False" Grid.Row="1" SnapsToDevicePixels="True">
-                                        <StackPanel IsItemsHost="True" Background="Transparent">
-                                        </StackPanel>
+                                        <StackPanel IsItemsHost="True" Background="Transparent"/>
                                     </ScrollViewer>
                                 </Grid>
                             </Popup>
@@ -94,37 +95,32 @@
                             <Trigger Property="IsGrouping" Value="true">
                                 <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
                             </Trigger>
-                            <Trigger SourceName="Popup" Property="Popup.AllowsTransparency" Value="true">
+                            <Trigger SourceName="Popup" Property="AllowsTransparency" Value="true">
                                 <Setter TargetName="DropDownBorder" Property="Margin" Value="0,2,0,0"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-            </Style.Triggers>
         </Style>
 
-<!--$$$$$$$$$$$$$$$$$-        МОИ СТИЛИ САМ ПИСАЛ ОТВЕЧАЮ            -$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
+        <!--$$$$$$$$$$$$$$$$$-        МОИ СТИЛИ САМ ПИСАЛ ОТВЕЧАЮ            -$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$-->
 
 
-        <Style TargetType="controls:MetroTabItem" >
+        <Style TargetType="{x:Type controls:MetroTabItem}" >
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="#FFFFCF73"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
-        <Style TargetType="TabItem" >
+
+        <Style TargetType="{x:Type TabItem}" >
             <Setter Property="Background" Value="#FFFFCF73"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Style.Triggers>
-             
-            </Style.Triggers>
         </Style>
-        
+
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1" x:Key="ExpanderGradientbrush">
             <GradientStop Color="BlanchedAlmond" Offset="0"/>
             <GradientStop Color="Blue" Offset="0.2"/>
@@ -136,7 +132,7 @@
             <GradientStop Color="BlanchedAlmond" Offset="1"/>
         </LinearGradientBrush>
     </controls:MetroWindow.Resources>
-   
+
 
     <Grid>
 
@@ -161,74 +157,60 @@
                                 <Button BorderBrush="Black" BorderThickness="3" Content="=" FontSize="30" FontWeight="UltraBold" Foreground="#FFFFBE40" FontFamily="Arial" Background="#FF2A4580" DockPanel.Dock="Right"/>
                                 <Border BorderBrush="#FFFFBE40" BorderThickness="8">
                                     <TextBox  Padding="10" FontSize="20" FontWeight="UltraBlack" TextAlignment="Center" Text="A+B+G*E^-1"
-                                                  Background="White" BorderBrush="#FF110B0B"  CaretBrush="#FF050359" SelectionBrush="#FF2A85AE" Foreground="Black">
-                                    </TextBox>
+                                                  Background="White" BorderBrush="#FF110B0B"  CaretBrush="#FF050359" SelectionBrush="#FF2A85AE" Foreground="Black"/>
                                 </Border>
                             </DockPanel>
                         </Grid>
 
                         <Grid Grid.Row="1">
                             <StackPanel>
-                                <TextBlock Padding="0,0,0,3" HorizontalAlignment="Left" FontSize="14">
-                                        <Run Foreground="Green">
-                                         ✅    
-                                        </Run>
-                                        <Run FontWeight="DemiBold">
-                                            Ошибок НЕТ
-                                        </Run>
-                                </TextBlock>
+                                <TextBlock Padding="0,0,0,3" HorizontalAlignment="Left" FontSize="14"><Run Foreground="Green" Text="✅"/><Run Text=" "/><Run FontWeight="DemiBold" Text="Ошибок НЕТ"/></TextBlock>
 
                                 <controls:MetroAnimatedSingleRowTabControl FontFamily="times new roman" Margin="0,0,0,3"  >
                                     <TabItem  Header="Выбор матрицы" >
-                                        <TabItem.Content>
-                                            <Border  BorderThickness="3" BorderBrush="#FFFFBE40" Background="#FFFFBE40">
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                                                    <ComboBox Name="ComboBox_orientation" Style="{StaticResource combobox_style}"  MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
-                                                        <ComboBoxItem Content="Ориентация" FontStyle="Italic" Visibility="Collapsed"/>
-                                                        <ComboBoxItem Content="лево" />
-                                                        <ComboBoxItem Content="право"/>
-                                                        <ComboBoxItem Content="верх"/>
-                                                        <ComboBoxItem Content="низ"/>
-                                                    </ComboBox>
+                                        <Border  BorderThickness="3" BorderBrush="#FFFFBE40" Background="#FFFFBE40">
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                                                <ComboBox x:Name="ComboBox_orientation" Style="{StaticResource combobox_style}"  MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
+                                                    <ComboBoxItem Content="Ориентация" FontStyle="Italic" Visibility="Collapsed"/>
+                                                    <ComboBoxItem Content="лево" />
+                                                    <ComboBoxItem Content="право"/>
+                                                    <ComboBoxItem Content="верх"/>
+                                                    <ComboBoxItem Content="низ"/>
+                                                </ComboBox>
 
-                                                    <ComboBox Name="ComboBox_common_elts" Style="{StaticResource combobox_style}" MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
-                                                        <ComboBoxItem Content="Значение однотипных элементов" FontStyle="Italic" Visibility="Collapsed"/>
+                                                <ComboBox x:Name="ComboBox_common_elts" Style="{StaticResource combobox_style}" MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
+                                                    <ComboBoxItem Content="Значение однотипных элементов" FontStyle="Italic" Visibility="Collapsed"/>
 
 
-                                                    </ComboBox>
+                                                </ComboBox>
 
-                                                    <ComboBox Name="comboBox_name" Style="{StaticResource combobox_style}" MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
-                                                        <ComboBoxItem Content="Название" FontStyle="Italic" Visibility="Collapsed"/>
+                                                <ComboBox x:Name="comboBox_name" Style="{StaticResource combobox_style}" MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
+                                                    <ComboBoxItem Content="Название" FontStyle="Italic" Visibility="Collapsed"/>
 
-                                                    </ComboBox>
-                                                </StackPanel>
-                                            </Border>
-                                        </TabItem.Content>
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </Border>
                                     </TabItem>
 
 
                                     <TabItem Header="История выражений" >
-                                        <TabItem.Content>
-                                            <DataGrid FontSize="14" FontWeight="Bold" FontFamily="arial" x:Name="DG_Expressions" AutoGenerateColumns="True" ItemsSource="{DynamicResource ResourceKey=phones}" Background="White" BorderBrush="#CCFFFFFF" OpacityMask="#FF21CEA6" >
-                                                <DataGrid.Resources  >
-                                                    <col:ArrayList x:Key="phones">
-                                                        <local:Exp Number="1" Expression="A+B+C" />
-                                                        <local:Exp Number="2" Expression="E^-1 * C - F" />
-                                                        <local:Exp Number="3" Expression="E^-1 + H - G" />
-                                                    </col:ArrayList>
-                                                </DataGrid.Resources>
-                                            </DataGrid>
-                                        </TabItem.Content>
+                                        <DataGrid FontSize="14" FontWeight="Bold" FontFamily="arial" x:Name="DG_Expressions" AutoGenerateColumns="True" ItemsSource="{DynamicResource ResourceKey=phones}" Background="White" BorderBrush="#CCFFFFFF" OpacityMask="#FF21CEA6" >
+                                            <DataGrid.Resources  >
+                                                <col:ArrayList x:Key="phones">
+                                                    <local:Exp Number="1" Expression="A+B+C" />
+                                                    <local:Exp Number="2" Expression="E^-1 * C - F" />
+                                                    <local:Exp Number="3" Expression="E^-1 + H - G" />
+                                                </col:ArrayList>
+                                            </DataGrid.Resources>
+                                        </DataGrid>
                                     </TabItem>
                                     <TabItem Header="Допустимые операции">
-                                        <TabItem.Content>
-                                            <UniformGrid  Columns="4" Rows="1"  VerticalAlignment="Bottom" HorizontalAlignment="Center">
-                                                <Button Content="➕"  MaxHeight="400" MaxWidth="400" FontSize="25" BorderBrush="Black" Background="#FFFFBE40" FontWeight="Bold"/>
-                                                <Button ToolTip="Получение обратной матрицы" Content="A^-1" MaxHeight="400" MaxWidth="400" FontSize="25" BorderBrush="Black"  Background="#FFFFBE40"   FontWeight="Bold"/>
-                                                <Button Content="✕"   MaxHeight="400" MaxWidth="400" FontSize="25" BorderBrush="Black"  Background="#FFFFBE40"  FontWeight="Bold"/>
-                                                <Button Content="➖"  MaxHeight="400" MaxWidth="400" FontSize="25" BorderBrush="Black" Background="#FFFFBE40"  FontWeight="Bold"/>
-                                            </UniformGrid>
-                                        </TabItem.Content>
+                                        <UniformGrid  Columns="4" Rows="1"  VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                                            <Button Content="➕"  MaxHeight="400" MaxWidth="400" FontSize="25" BorderBrush="Black" Background="#FFFFBE40" FontWeight="Bold"/>
+                                            <Button ToolTip="Получение обратной матрицы" Content="A^-1" MaxHeight="400" MaxWidth="400" FontSize="25" BorderBrush="Black"  Background="#FFFFBE40"   FontWeight="Bold"/>
+                                            <Button Content="✕"   MaxHeight="400" MaxWidth="400" FontSize="25" BorderBrush="Black"  Background="#FFFFBE40"  FontWeight="Bold"/>
+                                            <Button Content="➖"  MaxHeight="400" MaxWidth="400" FontSize="25" BorderBrush="Black" Background="#FFFFBE40"  FontWeight="Bold"/>
+                                        </UniformGrid>
                                     </TabItem>
                                 </controls:MetroAnimatedSingleRowTabControl>
                             </StackPanel>
@@ -256,9 +238,7 @@
 
                             <Grid Grid.Column="1">
 
-                                <TextBlock   HorizontalAlignment="Center" VerticalAlignment="Center"  FontSize="28" FontWeight="DemiBold" >
-                                            Матрица "Matrix1"
-                                </TextBlock>
+                                <TextBlock   HorizontalAlignment="Center" VerticalAlignment="Center"  FontSize="28" FontWeight="DemiBold" ><Run Text="Матрица &quot;Matrix1&quot;"/></TextBlock>
                             </Grid>
                             <Grid Grid.Column="2" HorizontalAlignment="Right">
 
@@ -271,8 +251,8 @@
                         </Grid>
 
                         <Grid Grid.Row="1">
-                            <dg2d:DataGrid2D Name="dataGrid2D" FontSize="20" VerticalScrollBarVisibility="Auto" IsReadOnly="True" 
-                                             ItemsSource2D="{Binding m_intArray}" Background="#FF4573D5"/>
+                            <dg2d:DataGrid2D x:Name="dataGrid2D" FontSize="20" VerticalScrollBarVisibility="Auto" IsReadOnly="True" 
+                                             ItemsSource2D="{Binding m_intArray}" Background="#FF4573D5" EnableColumnVirtualization="True"/>
 
                         </Grid>
                     </Grid>
@@ -298,40 +278,37 @@
                                 </Label>
                             </Expander.Header>
 
-                            <Expander.Content>
+                            <StackPanel>
                                 <StackPanel>
-                                    <StackPanel>
-                                        <TextBlock Text="Редактирование" TextDecorations="Underline" FontSize="20" FontWeight="Bold"/>
-                                        <Border BorderBrush="Gray" BorderThickness="3">
-                                            <StackPanel>
-                                                <TextBlock Text="Размер" FontSize="16" FontWeight="Bold"/>
-                                                <controls:NumericUpDown Value="0" FontSize="20" NumericInputMode="Numbers" TrackMouseWheelWhenMouseOver="True" Maximum="100000" Minimum="0"/>
-                                                <Button Content="Авто заполнение" FontSize="20" Background="#FFFFBE40"/>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="Ориентация:" FontSize="16" FontWeight="Bold" />
-                                                    <Button Margin="5,0,0,0" Click="Button_Orientation_Click">
-                                                        <Button.Content>
-                                                            <Image  x:Name="Image_OR" Source="C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\ОР.png" Width="50"/>
-                                                        </Button.Content>
-                                                        
-                                                    </Button>
-                                                </StackPanel>
-                                                <TextBlock Text="Значение однотипных элементов" TextDecorations="Underline" FontSize="16" FontWeight="Bold"/>
-                                                <TextBox Text="0" FontSize="20" MaxLength="50"/>
-
-                                            </StackPanel>
-                                        </Border>
-                                    </StackPanel>
-                                    <Border Margin="0,3,0,0" BorderBrush="Gray" BorderThickness="3">
+                                    <TextBlock Text="Редактирование" TextDecorations="Underline" FontSize="20" FontWeight="Bold"/>
+                                    <Border BorderBrush="Gray" BorderThickness="3">
                                         <StackPanel>
-                                            <Button Content="Добавить матрицу" FontSize="20" Background="#FFFFBE40"/>
-                                            <Button  Content="Открыть уже существующую" FontSize="20" Background="#FFBF7930" Click="Button_Open_existing_Matrix_Click"/>
-                                            <Button Content="Сохранить как" FontSize="20" Background="#FFFFBE40" Click="Button_save_as_left_expander_Click"/>
-                                            <Button Content="Удалить из списка" FontSize="20" Background="#FFBF7930"/>
+                                            <TextBlock Text="Размер" FontSize="16" FontWeight="Bold"/>
+                                            <controls:NumericUpDown x:Name="NumericUpDown" Value="50" FontSize="20" NumericInputMode="Numbers" TrackMouseWheelWhenMouseOver="True" Maximum="100000" Minimum="1" />
+                                            <Button Content="Авто заполнение" FontSize="20" Background="#FFFFBE40" Click="Button_Click_Auto_Fill"/>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Ориентация:" FontSize="16" FontWeight="Bold" />
+                                                <Button Margin="5,5,0,0" Click="Button_Orientation_Click">
+                                                    <Image  x:Name="Image_OR" Source="C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\bin\Debug\ОР.png" Width="50"/>
+
+                                                </Button>
+                                            </StackPanel>
+                                            <TextBlock Text="Значение однотипных элементов" TextDecorations="Underline" FontSize="16" FontWeight="Bold"/>
+                                            <TextBox x:Name="textBox_typical_elt" Text="0" FontSize="20" MaxLength="50" PreviewTextInput="TextBox_PreviewTextInput" MouseLeave="textBox_typical_elt_MouseLeave" />
+
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
-                            </Expander.Content>
+                                <Border Margin="0,3,0,0" BorderBrush="Gray" BorderThickness="3">
+                                    <StackPanel>
+                                        <Button Content="Добавить матрицу" FontSize="20" Background="#FFFFBE40"/>
+                                        <Button  Content="Открыть уже существующую" FontSize="20" Background="#FFBF7930" Click="Button_Open_existing_Matrix_Click"/>
+                                        <Button Content="Сохранить как" FontSize="20" Background="#FFFFBE40" Click="Button_save_as_left_expander_Click"/>
+                                        <Button Content="Удалить из списка" FontSize="20" Background="#FFBF7930"/>
+                                        <Button Content="Создать матрицу" FontSize="20" FontWeight="Bold" Background="White" Click="Button_Click_Create_Matrix"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
                         </Expander>
                     </Grid>
 
@@ -343,18 +320,30 @@
                         </Grid.RowDefinitions>
 
                         <Grid Grid.Row="0">
-                            <TextBlock Text="Матрица 'A' " HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="25" FontWeight="ExtraBold"/>
+                            <Border BorderBrush="White" BorderThickness="3" HorizontalAlignment="Center">
+                                <TextBlock Text="СОЗДАЙТЕ или ВЫБЕРИТЕ матрицу" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="25" FontWeight="ExtraBold"/>
+                            </Border>
                         </Grid>
                         <Grid Grid.Row="1">
-                            <dg2d:DataGrid2D Name="dataGrid2D_sec_page" FontSize="20" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
-                                                 ItemsSource2D="{Binding str_arr2}" Background="#FF4573D5"/>
+                            <dg2d:DataGrid2D x:Name="dataGrid2D_sec_page" FontSize="20" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
+                                                 VerticalGridLinesBrush="Black" HorizontalGridLinesBrush="Black" 
+                                             Foreground="Black" Background="#FF4573D5" dataGrid2D:Index.StartAt="16" EnableColumnVirtualization="True"/>
+                            <!--<DataGrid >
+                                <DataGrid.ItemsSource >
+                                    <MultiBinding    Converter="{StaticResource MatrixToDataViewConverter}">
+                                        <Binding Path="ColumnHeaders"/>
+                                        <Binding Path="RowHeaders"/>
+                                        <Binding Path="Values"/>
+                                    </MultiBinding>
+                                </DataGrid.ItemsSource>
+                            </DataGrid>-->
                         </Grid>
                         <Grid Grid.Row="2">
                             <StackPanel  Orientation="Horizontal">
                                 <TextBlock Margin="0,0,3,0" FontWeight="Bold" FontSize="20" Text="Представление:"/>
                                 <controls:MetroAnimatedSingleRowTabControl BorderThickness="0" Background="White">
-                                    <TabItem Header="Обычное"  FontSize="19"  controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold" Background="#FFFFCF73" />
-                                    <TabItem Header="Упакованное" controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold"/>
+                                    <TabItem Name="TabItem_Normal_Form" Header="Обычное"  FontSize="19"  controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold" Background="#FFFFCF73" GotFocus="TabItem_GotFocus_Matrix_Form" />
+                                    <TabItem Name="TabItem_Dense_Form" Header="Упакованное" controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold" GotFocus="TabItem_GotFocus_Dense_Form"/>
                                     <TabItem Header="С адресами" controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold"/>
                                 </controls:MetroAnimatedSingleRowTabControl>
                             </StackPanel>

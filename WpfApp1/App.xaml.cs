@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
+using System.Linq;
+using System.Windows.Data;
 
 namespace Wpf_Matrices
 {
@@ -10,8 +15,11 @@ namespace Wpf_Matrices
         public string Number { get; set; }
         public string Expression { get; set; }
     }
+    
+
     public partial class App
     {
         
+
     }
 }
