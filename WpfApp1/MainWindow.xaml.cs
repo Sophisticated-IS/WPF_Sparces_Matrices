@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -15,10 +17,10 @@ namespace Wpf_Matrices
 
     public partial class MainWindow
     {
-      
-        ImageSource[] orientations = new ImageSource[4];//массив на 4 пути к картинкам с ориентацией треуг матрицы
+        const string path_to_FS = @"C:\Users\Sova IS\Desktop\WPF_triangular_matrix_root\Матрицы\";//путь в корне программы до папки с матрицами
+        readonly ImageSource[] orientations  = new ImageSource[4];//массив на 4 пути к картинкам с ориентацией треуг матрицы
         int index_image=0;//индекс текущей картинки в массиве orientations
-
+        List<string> list_matrices = new List<string>();
         int orientation_number = 1; 
         int dimension=50;
         string[,] array_inp = new string[50, 50];//массив для работы со вторым datagrid
@@ -104,7 +106,7 @@ namespace Wpf_Matrices
             }
          }
          public void validate_numericup_down ()
-        {
+         {
             if (string.IsNullOrEmpty(NumericUpDown.Value.ToString()))
             {
                 MessageBox.Show("Размерность не может быть пустой");
@@ -169,7 +171,129 @@ namespace Wpf_Matrices
                 return amount;
             }
          }
+         public bool validate_2Darray(string[,] array,int dim1,int dim2,string add_message)
+         {
+            for (int i = 0; i < dim1; i++)
+            {
+                for (int j = 0; j < dim2; j++)
+                {
+                    try
+                    {
+                        double tmp = Convert.ToDouble(array[i, j]);
+                    }
+                    catch (FormatException)
+                    {
+                        MessageBox.Show($"Ошибка {add_message}! Элемент в строке {i} и стобце {j} не является действительным числом!", "Ошибка при вводе элементов");
+                        return false;
+                    }
+                }
+            }
+            return true;
+         }
+
         //Логически важные методы (Лучше вынести в класс потом )
+        private void save_matrix_in_file(string File_path,string message)
+        {
+            
+
+                if ((TabItem_Normal_Form.IsSelected && validate_2Darray(array_inp, dimension, dimension, $"при {message} матрицы в файл  из Матричной формы")) ||
+                        (TabItem_Dense_Form.IsSelected && validate_2Darray(array_dense, amount_of_not_null_elts(dimension), 1, $"при {message}  матрицы в файл из Упакованной формы"))) //если в массивах только double числа
+                    using (var file = File.CreateText(File_path))
+                    {
+                        file.WriteLine(dimension);
+                        file.WriteLine(orientation_number);
+                        file.WriteLine(typical_elt);
+
+                        if (TabItem_Normal_Form.IsSelected)
+                        {
+
+                            for (int i = 0; i < dimension; i++)
+                            {
+                                string row_buffer = "";
+                                for (int j = 0; j < dimension; j++)
+                                {
+                                    row_buffer += array_inp[i, j] + " ";
+                                }
+                                file.WriteLine(row_buffer.TrimEnd(' '));
+                            }
+                            MessageBox.Show("Файл с матрицей успешно сохранен!");
+                        }
+                        else
+                        {
+                            if (TabItem_Dense_Form.IsSelected)//если матрица в норм форме и все элементы - double
+                            {
+                                int counter = 0;//обращение к упакованному массиву
+                                for (int i = 0; i < dimension; i++)
+                                {
+                                    string row_buffer = "";
+                                    for (int j = 0; j < dimension; j++)
+                                    {
+                                        switch (orientation_number)
+                                        {
+                                            case 1:
+
+                                                if (i + j < dimension - 1)
+                                                {
+                                                    row_buffer += array_dense[counter, 0] + " ";
+                                                    counter++;
+                                                }
+                                                else
+                                                {
+                                                    row_buffer += typical_elt.ToString() + " ";
+                                                }
+                                                break;
+
+                                            case 2:
+
+                                                if (!(i + j < dimension))
+                                                {
+                                                    row_buffer += array_dense[counter, 0] + " ";
+                                                    counter++;
+                                                }
+                                                else
+                                                {
+                                                    row_buffer += typical_elt.ToString() + " ";
+                                                }
+                                                break;
+
+                                            case 3:
+
+                                                if (!(i >= j))
+                                                {
+                                                    row_buffer += array_dense[counter, 0] + " ";
+                                                    counter++;
+                                                }
+                                                else
+                                                {
+                                                    row_buffer += typical_elt.ToString() + " ";
+                                                }
+                                                break;
+
+                                            case 4:
+
+                                                if (!(i <= j))
+                                                {
+                                                    row_buffer += array_dense[counter, 0] + " ";
+                                                    counter++;
+                                                }
+                                                else
+                                                {
+                                                    row_buffer += typical_elt.ToString() + " ";
+                                                }
+                                                break;
+
+                                            default: throw new Exception("Не распознана ориентация для заполнения упакованной формы при записи в файл ");
+                                        }
+                                    }
+                                    file.WriteLine(row_buffer.TrimEnd(' '));
+                                }
+                                MessageBox.Show("Файл с матрицей успешно сохранен!");
+                            }
+                            else;
+                        }
+
+                    }
+            }
 
 
         private void Save_Matrix_Dialog(object sender, System.Windows.RoutedEventArgs e)
@@ -193,7 +317,7 @@ namespace Wpf_Matrices
         private void Button_Open_existing_Matrix_Click(object sender, RoutedEventArgs e)
         {
             // Create OpenFileDialog 
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            var dlg = new Microsoft.Win32.OpenFileDialog();
 
 
 
@@ -208,7 +332,206 @@ namespace Wpf_Matrices
            
             if (result == true)
             {
-                MessageBox.Show("Файл с матрицей успешно открыт!");
+                using (var file = new StreamReader(dlg.FileName))
+                {
+                    string line;
+                    int number_of_rows = 0;
+
+                    int local_dimension = 0;
+                    int local_orientation_number;
+                    double local_typical_elt;
+                    //1)размерность
+                    //2)ориентация
+                    //3)однотип эл-нт
+                    if ((line = file.ReadLine()) != null)//размерность
+                    {
+                        try
+                        {
+                            local_dimension = Convert.ToInt32(line);
+                            if (local_dimension > 0 && local_dimension <=100000)
+                            {
+
+                            }
+                            else
+                            {
+                                MessageBox.Show($"В файле {dlg.FileName} размерность выходит из диапазона {{0:100,000}}!", "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                                return;
+                            }
+                        }
+                        catch (FormatException)
+                        {
+                            MessageBox.Show($"В файле {dlg.FileName} указана неверная размерность!", "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                            return;
+                        }
+
+                        if ((line = file.ReadLine()) != null)//ориентация
+                        {
+                            try
+                            {
+                                local_orientation_number = Convert.ToInt32(line);
+                                if (local_orientation_number>0 && local_orientation_number<=4)
+                                {
+
+                                }
+                                else
+                                {
+                                    MessageBox.Show($"В файле {dlg.FileName} указана неверная ориентация! Виды ориентации:1)1 -ВЫШЕ Побочной 2)2 -НИЖЕ Побочной 3)3 -ВЫШЕ Главной 4)4 -НИЖЕ Главной ",
+                                        "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                                    return;
+                                }
+                            }
+                            catch (FormatException)
+                            {
+                                MessageBox.Show($"В файле {dlg.FileName} указана неверная ориентация!", "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                                return;
+                            }
+
+                            if ((line = file.ReadLine()) != null)//однотипный элемент
+                            {
+                                try
+                                {
+                                    local_typical_elt = Convert.ToDouble(line);
+                                }
+                                catch (FormatException)
+                                {
+                                    MessageBox.Show($"В файле {dlg.FileName} указан невереный однотипный элемент!", "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                                    return;
+                                }
+
+                                while ((line = file.ReadLine()) != null)
+                                {
+                                    string[] str_elts = line.Split(' ');
+
+                                    int i = 0;
+                                    for (; i < str_elts.Length; i++)
+                                    {
+                                        try
+                                        {
+                                            double tmp = Convert.ToDouble(str_elts[i]);
+                                        }
+                                        catch (FormatException)
+                                        {
+
+                                            MessageBox.Show($"В файле {dlg.FileName} не удалось преобразовать элемент №{i + 1} в строке {number_of_rows + 1 + 3} !", "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                                            return;
+                                        }
+                                    }
+                                    number_of_rows++;
+                                    if (i != local_dimension)//
+                                    {
+                                        MessageBox.Show($"В файле {dlg.FileName} число столбцов({i}) в строке {number_of_rows} не совпадает с размерностью{local_dimension}", "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                                        return;
+                                    }
+                                    else;//строка = размрности
+                                }
+                                if (number_of_rows != local_dimension)
+                                {
+                                    MessageBox.Show($"В файле {dlg.FileName} число строк({number_of_rows}) не совпадает с размерностью({local_dimension})", "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                                    return;
+                                }
+                                else//если в файле матрица квадратная
+                                {
+                                    //TODO: ДОБАВИТЬ ПРОВЕРКУ НА ОРИЕНТАЦИя но ОНА будет много жрать ЦП так как проверить нужно все элементы 
+                                    //все в порядке то добавим в список и надо ли считывать?
+                                    MessageBox.Show("Матрица в файле валидна");
+                                    cancel_handle_norm_form = true;
+                                    TabItem_Dense_Form.IsSelected = true;//
+
+                                    using (var file2 = new StreamReader(dlg.FileName))//второй раз открываю файл чтобы уже считать,так как он был проверен
+                                    {
+                                     //Пропустим размерность, ориентацию и однотип эл-нт   
+                                        file2.ReadLine();
+                                        file2.ReadLine();
+                                        file2.ReadLine();
+                                        dimension = local_dimension;
+                                        orientation_number = local_orientation_number;
+                                        typical_elt = local_typical_elt;
+                                        //обновляем графический интерфейс
+                                        NumericUpDown.Value = dimension;
+                                        textBox_typical_elt.Text = typical_elt.ToString();
+                                        Image_OR.Source = orientations[orientation_number-1];
+                                       //выделим память
+                                        array_dense = new string[amount_of_not_null_elts(dimension), 1];
+                                        int i = 0;
+                                        int j = 0;
+                                        int counter = 0;//по aray_dense
+                                        while ((line = file.ReadLine()) != null)
+                                        {
+                                            string[] str_elts = line.Split(' ');
+                                            foreach (var item in str_elts)
+                                            {
+                                                switch (orientation_number)
+                                                {
+                                                    case 1:
+
+                                                        if (i + j < dimension - 1)
+                                                        {
+
+                                                            array_dense[counter, 0] = item;
+                                                            counter++;
+                                                        }
+                                                        else; //пустая строка
+
+                                                        break;
+
+                                                    case 2:
+
+                                                        if (!(i + j < dimension))
+                                                        {
+                                                            array_dense[counter, 0] = item;
+                                                            counter++;
+                                                        }
+                                                        else; //пустая строка
+                                                        break;
+
+                                                    case 3:
+
+                                                        if (!(i >= j))
+                                                        {
+                                                            array_dense[counter, 0] = item;
+                                                            counter++;
+                                                        }
+                                                        else; //пустая строка
+                                                        break;
+
+                                                    case 4:
+
+                                                        if (!(i <= j))
+                                                        {
+                                                            array_dense[counter, 0] = item;
+                                                            counter++;
+                                                        }
+                                                        else; //пустая строка
+                                                        break;
+
+                                                    default: throw new Exception("Не распознана ориентация для заполнения упакованной формы ");
+                                                }
+                                            }
+                                            i++;
+                                        }
+                                        dataGrid2D_sec_page.ItemsSource2D = array_dense;
+                                        MessageBox.Show("Файл с матрицей успешно открыт!");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show($"В файле {dlg.FileName} НЕ указано значение однотипного элемента!", "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show($"В файле {dlg.FileName} НЕ указана ориентация!", "ОШИБКА ПРИ СЧИТЫВАНИИ ФАЙЛА");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Файл пуст!");
+                    }
+                }
+               
             }
         }
 
@@ -225,12 +548,12 @@ namespace Wpf_Matrices
 
 
             // Display SaveFileDialog by calling ShowDialog method 
-            Nullable<bool> result = dlg.ShowDialog();
+            bool? result = dlg.ShowDialog();
 
 
             if (result == true)
             {
-                MessageBox.Show("Файл с матрицей успешно сохранен!");
+                save_matrix_in_file(dlg.FileName, "сохранении");
             }
         }
 
@@ -306,8 +629,7 @@ namespace Wpf_Matrices
             {
                 if (TabItem_Dense_Form.IsSelected)
                 {
-                    MessageBoxResult boxResult = new MessageBoxResult();
-                    boxResult= MessageBox.Show("Вы уверены что хотите создать новую матрицу в упакованной форме?", "ВОЗМОЖНАЯ ПОТЕРЯ ДАННЫХ", MessageBoxButton.YesNo);
+                    MessageBoxResult    boxResult= MessageBox.Show("Вы уверены что хотите создать новую матрицу в упакованной форме?", "ВОЗМОЖНАЯ ПОТЕРЯ ДАННЫХ", MessageBoxButton.YesNo);
                     if (boxResult == MessageBoxResult.Yes)
                     {
                         try
@@ -456,7 +778,6 @@ namespace Wpf_Matrices
                 { 
                     cancel_handle_norm_form = true;
                     TabItem_Dense_Form.IsSelected = true;
-                   
                 }
             }
             else//по памяти и времени все ок
@@ -565,7 +886,132 @@ namespace Wpf_Matrices
                 }
                 else;//адреса не реализованы(((((
             }
+            MessageBox.Show("Матрица успешно заполнена случайными числами");
         }
-    }                     
-}                       
+
+        private void Button_Click_Add_To_List(object sender, RoutedEventArgs e)
+        {
+            
+            
+            if (TabItem_Normal_Form.IsSelected)
+            {
+                for (int i = 0; i < dimension; i++)
+                {
+                    for (int j = 0; j < dimension; j++)
+                    {
+                        if (string.IsNullOrEmpty(array_inp[i, j]))
+                        {
+                            MessageBox.Show($"Невозможно добавить матрицу в матричной форме т.к. в ней присутсвуют пустые элементы(строка{i} столбец{j})");
+                            return;
+                        }
+                        else;//элемент на месте
+                    }
+                }
+            }
+            else
+            {
+                if (TabItem_Dense_Form.IsSelected)
+                {
+                    for (int i = 0; i < amount_of_not_null_elts(dimension); i++)
+                    {
+                        if (string.IsNullOrEmpty(array_dense[i, 0]))
+                        {
+                            MessageBox.Show($"Невозможно добавить матрицу в упакованной форме т.к. в ней присутсвуют пустые элементы(строка{i})");
+                            return;
+                        }
+                        else;//элемент на месте
+                    }
+                }
+                else;
+            }
+            WpfApp1.Window1_pop_up_input_matrix_name Matrix_name_pop_up = new WpfApp1.Window1_pop_up_input_matrix_name();
+            Matrix_name_pop_up.ShowDialog();
+            if (Matrix_name_pop_up.IsCancelled)
+            {
+               //ничего не делаем
+            }
+            else
+            {
+                string Matrix_name = Matrix_name_pop_up.get_Matrix_name;
+                if (string.IsNullOrEmpty(Matrix_name))
+                {
+                    MessageBox.Show("Имя матрицы не может быть пустым!");
+                }
+                else
+                {
+
+                    if (list_matrices.Find(delegate (string str) { return str == Matrix_name; }) == null)
+                    {
+                        save_matrix_in_file(path_to_FS + Matrix_name + ".txt", "добавлении");
+                        list_matrices.Add(Matrix_name);
+                        List_Matrices.ItemsSource = list_matrices;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Матрица с таким названием уже существует!","ОШИБКА ПРИ ДОБАВЛЕНИИ МАТРИЦЫ");
+                    }
+                    
+                }
+            }
+            
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            List<string> sorted_list = new List<string>();
+            List<string> left_elts = new List<string>();
+            foreach (var item in List_Matrices.Items)
+            {
+                if (item.ToString().StartsWith(text_box_search.Text))//
+                {
+                    sorted_list.Add(item.ToString());
+                }
+                else
+                {
+                    left_elts.Add(item.ToString());
+                }
+            }
+            List_Matrices.ItemsSource =  sorted_list.Concat(left_elts);
+        }
+
+        private void Button_Click_delete_from_Matrix_List(object sender, RoutedEventArgs e)
+        {
+            string file_path = path_to_FS + List_Matrices.SelectedItem + ".txt";
+
+            if (List_Matrices.SelectedItem is  null)
+            {
+
+            }
+            else
+            {
+                if (File.Exists(file_path))
+                {
+                    
+                    if (MessageBox.Show($"Вы уверены что хотите удалить атрицу \"{List_Matrices.SelectedItem}\"?", "Подтвердите удаление", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        File.Delete(file_path);
+                        list_matrices.Remove(List_Matrices.SelectedItem.ToString());
+                        List_Matrices.ItemsSource = new List<string>();
+                        List_Matrices.ItemsSource = list_matrices;
+                        MessageBox.Show("Матрица успешно удалена");
+                    }
+                    else
+                    {
+                         //мы ничего не удаляем
+                    }
+                    
+                }
+                else//если файла нет то, удалим его из списка раз пользователь влез в файловый каталог проги 
+                {
+                    MessageBox.Show("Матрица для удаления не найдена!");
+                    list_matrices.Remove(List_Matrices.SelectedItem.ToString());
+                    List_Matrices.ItemsSource = new List<string>();
+                    List_Matrices.ItemsSource = list_matrices;
+                }
+              
+            }
+            
+        }
+    }
+}
                          

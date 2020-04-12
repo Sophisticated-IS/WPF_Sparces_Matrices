@@ -8,7 +8,6 @@
                           xmlns:local="clr-namespace:Wpf_Matrices"
                           xmlns:dg2d="clr-namespace:DataGrid2DLibrary;assembly=DataGrid2DLibrary"
     xmlns:Converter="clr-namespace:WpfApp1"
-    xmlns:interactivity="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:dataGrid2D="http://gu.se/DataGrid2D"
                           x:Class="Wpf_Matrices.MainWindow"
     mc:Ignorable ="d"
@@ -252,7 +251,7 @@
 
                         <Grid Grid.Row="1">
                             <dg2d:DataGrid2D x:Name="dataGrid2D" FontSize="20" VerticalScrollBarVisibility="Auto" IsReadOnly="True" 
-                                             ItemsSource2D="{Binding m_intArray}" Background="#FF4573D5" EnableColumnVirtualization="True"/>
+                                             ItemsSource2D="{Binding m_intArray}" Background="#FF4573D5" EnableColumnVirtualization="True" IsManipulationEnabled="True" />
 
                         </Grid>
                     </Grid>
@@ -301,10 +300,10 @@
                                 </StackPanel>
                                 <Border Margin="0,3,0,0" BorderBrush="Gray" BorderThickness="3">
                                     <StackPanel>
-                                        <Button Content="Добавить матрицу" FontSize="20" Background="#FFFFBE40"/>
+                                        <Button Content="Добавить матрицу" FontSize="20" Background="#FFFFBE40" Click="Button_Click_Add_To_List"/>
                                         <Button  Content="Открыть уже существующую" FontSize="20" Background="#FFBF7930" Click="Button_Open_existing_Matrix_Click"/>
                                         <Button Content="Сохранить как" FontSize="20" Background="#FFFFBE40" Click="Button_save_as_left_expander_Click"/>
-                                        <Button Content="Удалить из списка" FontSize="20" Background="#FFBF7930"/>
+                                        <Button Content="Удалить из списка" FontSize="20" Background="#FFBF7930" Click="Button_Click_delete_from_Matrix_List"/>
                                         <Button Content="Создать матрицу" FontSize="20" FontWeight="Bold" Background="White" Click="Button_Click_Create_Matrix"/>
                                     </StackPanel>
                                 </Border>
@@ -320,9 +319,7 @@
                         </Grid.RowDefinitions>
 
                         <Grid Grid.Row="0">
-                            <Border BorderBrush="White" BorderThickness="3" HorizontalAlignment="Center">
-                                <TextBlock Text="СОЗДАЙТЕ или ВЫБЕРИТЕ матрицу" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="25" FontWeight="ExtraBold"/>
-                            </Border>
+                            <TextBlock Name="Label_Matrix_Name" Text="СОЗДАЙТЕ или ВЫБЕРИТЕ матрицу" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="25" FontWeight="ExtraBold"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <dg2d:DataGrid2D x:Name="dataGrid2D_sec_page" FontSize="20" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
@@ -359,27 +356,30 @@
                                     </Label.LayoutTransform>
                                 </Label>
                             </Expander.Header>
-                            <StackPanel>
 
-                                <TextBox controls:TextBoxHelper.Watermark="🔎 Поиск матрицы" FontSize="16" SelectionBrush="#FF4573D5"/>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="AUTO"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <TextBox Name="text_box_search" controls:TextBoxHelper.Watermark="🔎 Поиск матрицы" FontSize="16" SelectionBrush="#FF4573D5" TextChanged="TextBox_TextChanged"/>
 
-                                <ListView FontSize="14">
-                                    <TextBlock Text="Матрица 1" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 2" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 3" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 4" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 5" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 6" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 7" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 8" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 9" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 10" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 11" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 12" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 13" FontSize="16" FontWeight="Bold"/>
-                                    <TextBlock Text="Матрица 14" FontSize="16" FontWeight="Bold"/>
-                                </ListView>
-                            </StackPanel>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <ListView IsTextSearchEnabled="True"  VerticalContentAlignment="Top" Name="List_Matrices" FontSize="16" OverridesDefaultStyle="False" 
+                                               FontWeight="Bold" HorizontalAlignment="Stretch"/>
+                                </Grid>
+                                
+                                <!--<ListBox ScrollViewer.CanContentScroll="False" ScrollViewer.VerticalScrollBarVisibility="Visible" Name="List_Box">
+                                </ListBox>-->
+                                <!--<ItemsPresenter />-->
+                            </Grid>
+                            <!--</ListView>-->
+
+
+
+                          
                         </Expander>
                     </Grid>
 

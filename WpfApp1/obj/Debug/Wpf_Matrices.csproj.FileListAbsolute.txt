@@ -27,3 +27,5 @@ C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\WpfApp1.exe
 C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\WpfApp1.pdb
 C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\Window_save_result_matrix.g.cs
 C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\Window_save_result_matrix.baml
+C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\Window1_pop_up_input_matrix_name.g.cs
+C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\obj\Debug\Window1_pop_up_input_matrix_name.baml
