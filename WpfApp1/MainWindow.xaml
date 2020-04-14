@@ -171,10 +171,18 @@
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                                                 <ComboBox x:Name="ComboBox_orientation" Style="{StaticResource combobox_style}"  MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
                                                     <ComboBoxItem Content="Ориентация" FontStyle="Italic" Visibility="Collapsed"/>
-                                                    <ComboBoxItem Content="лево" />
-                                                    <ComboBoxItem Content="право"/>
-                                                    <ComboBoxItem Content="верх"/>
-                                                    <ComboBoxItem Content="низ"/>
+                                                    <ComboBoxItem>
+                                                        <Image Source="Images\Orientations(minsize) for comboBox\ОР.png"/>
+                                                    </ComboBoxItem>
+                                                    <ComboBoxItem>
+                                                        <Image Source="Images\Orientations(minsize) for comboBox\OP2.png"/>
+                                                    </ComboBoxItem>
+                                                    <ComboBoxItem>
+                                                        <Image Source="Images\Orientations(minsize) for comboBox\OP3.png"/>
+                                                    </ComboBoxItem>
+                                                    <ComboBoxItem>
+                                                        <Image Source="Images\Orientations(minsize) for comboBox\OP4.png"/>
+                                                    </ComboBoxItem>
                                                 </ComboBox>
 
                                                 <ComboBox x:Name="ComboBox_common_elts" Style="{StaticResource combobox_style}" MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
@@ -268,7 +276,7 @@
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0" MaxWidth="400">
-                        <Expander ExpandDirection="Right" BorderThickness="3" Background="{StaticResource ExpanderGradientbrush}" BorderBrush="#FFFFBE40">
+                        <Expander IsExpanded="True" ExpandDirection="Right" BorderThickness="3" Background="{StaticResource ExpanderGradientbrush}" BorderBrush="#FFFFBE40">
                             <Expander.Header>
                                 <Label Content="Характеристики матрицы" VerticalAlignment="Center" FontWeight="Bold" FontSize="14" Foreground="Black">
                                     <Label.LayoutTransform>
@@ -292,7 +300,7 @@
 
                                                 </Button>
                                             </StackPanel>
-                                            <TextBlock Text="Значение однотипных элементов" TextDecorations="Underline" FontSize="16" FontWeight="Bold"/>
+                                            <TextBlock Text="Значение однотипных элементов" TextDecorations="Underline" FontSize="18" FontWeight="ExtraBold"/>
                                             <TextBox x:Name="textBox_typical_elt" Text="0" FontSize="20" MaxLength="50" PreviewTextInput="TextBox_PreviewTextInput" MouseLeave="textBox_typical_elt_MouseLeave" />
 
                                         </StackPanel>
@@ -324,7 +332,7 @@
                         <Grid Grid.Row="1">
                             <dg2d:DataGrid2D x:Name="dataGrid2D_sec_page" FontSize="20" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
                                                  VerticalGridLinesBrush="Black" HorizontalGridLinesBrush="Black" 
-                                             Foreground="Black" Background="#FF4573D5" dataGrid2D:Index.StartAt="16" EnableColumnVirtualization="True"/>
+                                             Foreground="Black" Background="#FF4573D5" dataGrid2D:Index.StartAt="16" EnableColumnVirtualization="True" IsSynchronizedWithCurrentItem="True" AutomationProperties.IsRequiredForForm="True"/>
                             <!--<DataGrid >
                                 <DataGrid.ItemsSource >
                                     <MultiBinding    Converter="{StaticResource MatrixToDataViewConverter}">
@@ -341,7 +349,7 @@
                                 <controls:MetroAnimatedSingleRowTabControl BorderThickness="0" Background="White">
                                     <TabItem Name="TabItem_Normal_Form" Header="Обычное"  FontSize="19"  controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold" Background="#FFFFCF73" GotFocus="TabItem_GotFocus_Matrix_Form" />
                                     <TabItem Name="TabItem_Dense_Form" Header="Упакованное" controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold" GotFocus="TabItem_GotFocus_Dense_Form"/>
-                                    <TabItem Header="С адресами" controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold"/>
+                                    <TabItem Header="С адресами" controls:ControlsHelper.HeaderFontSize="10" controls:ControlsHelper.HeaderFontWeight="Bold" PreviewMouseDown="TabItem_PreviewMouseDown"/>
                                 </controls:MetroAnimatedSingleRowTabControl>
                             </StackPanel>
                         </Grid>
@@ -368,7 +376,7 @@
                                 </Grid>
                                 <Grid Grid.Row="1">
                                     <ListView IsTextSearchEnabled="True"  VerticalContentAlignment="Top" Name="List_Matrices" FontSize="16" OverridesDefaultStyle="False" 
-                                               FontWeight="Bold" HorizontalAlignment="Stretch"/>
+                                               FontWeight="Bold" HorizontalAlignment="Stretch" MouseDoubleClick="List_Matrices_MouseDoubleClick"/>
                                 </Grid>
                                 
                                 <!--<ListBox ScrollViewer.CanContentScroll="False" ScrollViewer.VerticalScrollBarVisibility="Visible" Name="List_Box">

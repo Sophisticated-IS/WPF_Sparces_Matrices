@@ -137,5 +137,21 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Orientations for button\OP2.png" />
+    <Resource Include="Images\Orientations for button\OP3.png" />
+    <Resource Include="Images\Orientations for button\OP4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Orientations%28minsize%29 for comboBox\OP2.png" />
+    <Resource Include="Images\Orientations%28minsize%29 for comboBox\OP3.png" />
+    <Resource Include="Images\Orientations%28minsize%29 for comboBox\OP4.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Orientations%28minsize%29 for comboBox\ОР.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Orientations for button\ОР.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
