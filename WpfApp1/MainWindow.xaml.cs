@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
 
 namespace Wpf_Matrices
@@ -18,14 +12,17 @@ namespace Wpf_Matrices
     public partial class MainWindow
     {
         const string path_to_FS = @"C:\Users\Sova IS\Desktop\WPF_triangular_matrix_root\Матрицы\";//путь в корне программы до папки с матрицами
-        readonly ImageSource[] orientations  = new ImageSource[4];//массив на 4 пути к картинкам с ориентацией треуг матрицы
-        int index_image=0;//индекс текущей картинки в массиве orientations
-        List<string> list_matrices = new List<string>();
-        int orientation_number = 1; 
-        int dimension=50;
+        readonly ImageSource[] orientations = new ImageSource[4];//массив на 4 пути к картинкам с ориентацией треуг матрицы
+        int index_image = 0;//индекс текущей картинки в массиве orientations
+
+        List<string> list_matrices = new List<string>();//хранится имя матрицы
+        List<int> list_matrices_orient = new List<int>();
+        List<string> list_matrices_typic_elt = new List<string>();//заменил double на string из-за ненужного округления
+        int orientation_number = 1;
+        int dimension = 50;
         string[,] array_inp = new string[50, 50];//массив для работы со вторым datagrid
         double typical_elt = 0;//значение однотип элемента
-        string[,] array_dense = new string[0,0];
+        string[,] array_dense = new string[0, 0];
         bool cancel_handle_norm_form = false;//проверяет отменил ли пользователь переход из dense form в normal form
         public MainWindow()
         {
@@ -36,20 +33,20 @@ namespace Wpf_Matrices
             orientations[2] = (ImageSource)cvrt.ConvertFromString(@"C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\Images\Orientations for button\OP3.png");
             orientations[3] = (ImageSource)cvrt.ConvertFromString(@"C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\Images\Orientations for button\OP4.png");
 
-            fill_array_depend_on_orient(array_inp, 50, 1,typical_elt);
+            fill_array_depend_on_orient(array_inp, 50, 1, typical_elt);
             dataGrid2D_sec_page.ItemsSource2D = array_inp;
-            double[,] default_datagrid_result = new double[20,100];
+            double[,] default_datagrid_result = new double[20, 100];
             dataGrid2D.ItemsSource2D = default_datagrid_result;
-            
+
             ComboBox_orientation.SelectedIndex = 0;
             comboBox_name.SelectedIndex = 0;
             ComboBox_common_elts.SelectedIndex = 0;
 
         }
         //Логически важные методы (Лучше вынести в класс потом )
-         public void fill_array_depend_on_orient (string[,] array,int dim, int orientation_number,double typical_elt)//заполняет однотипные эл-ты в массиве
-         {
-            if (dim>1)
+        public void fill_array_depend_on_orient(string[,] array, int dim, int orientation_number, double typical_elt)//заполняет однотипные эл-ты в массиве
+        {
+            if (dim > 1)
             {
                 for (int i = 0; i < dim; i++)
                 {
@@ -59,7 +56,7 @@ namespace Wpf_Matrices
                         {
                             case 1:
 
-                                if (i + j >= dim - 1)
+                                if (i + j > dim - 1)
                                 {
                                     array[i, j] = typical_elt.ToString();
                                 }
@@ -69,7 +66,7 @@ namespace Wpf_Matrices
 
                             case 2:
 
-                                if (i + j < dim)
+                                if (i + j < dim - 1)
                                 {
                                     array[i, j] = typical_elt.ToString();
                                 }
@@ -78,7 +75,7 @@ namespace Wpf_Matrices
 
                             case 3:
 
-                                if (i >= j)
+                                if (i > j)
                                 {
                                     array[i, j] = typical_elt.ToString();
                                 }
@@ -87,7 +84,7 @@ namespace Wpf_Matrices
 
                             case 4:
 
-                                if (i <= j)
+                                if (i < j)
                                 {
                                     array[i, j] = typical_elt.ToString();
                                 }
@@ -104,19 +101,19 @@ namespace Wpf_Matrices
             {
                 //оставим пустым элемент
             }
-         }
-         public void validate_numericup_down ()
-         {
+        }
+        public void validate_numericup_down()
+        {
             if (string.IsNullOrEmpty(NumericUpDown.Value.ToString()))
             {
                 MessageBox.Show("Размерность не может быть пустой");
                 NumericUpDown.Value = 1;
             }
             else;
-         }
-         public void validate_txt_box_only_double() 
-         {
-            if (string.IsNullOrEmpty(textBox_typical_elt.Text) || textBox_typical_elt.Text=="0")
+        }
+        public void validate_txt_box_only_double()
+        {
+            if (string.IsNullOrEmpty(textBox_typical_elt.Text) || textBox_typical_elt.Text == "0")
             {
                 textBox_typical_elt.Text = "0";
             }
@@ -127,8 +124,8 @@ namespace Wpf_Matrices
                 bool one_point = true;
                 bool one_minus = true;
                 string handled_str = "";//храним обработанную строку
-          
-                for (int i = 0; i < str_numeric.Length;i++)//удаление всего кроме цифр 1 точки и 1 минуса
+
+                for (int i = 0; i < str_numeric.Length; i++)//удаление всего кроме цифр 1 точки и 1 минуса
                 {
                     if (char.IsDigit(str_numeric[i]))
                     {
@@ -136,14 +133,14 @@ namespace Wpf_Matrices
                     }
                     else
                     {
-                        if (one_minus && str_numeric[i] == '-' )
+                        if (one_minus && str_numeric[i] == '-')
                         {
                             handled_str += '-';
                             one_minus = false;
                         }
                         else;
 
-                        if (one_point && str_numeric[i] =='.')
+                        if (one_point && str_numeric[i] == '.')
                         {
                             handled_str += '.';
                             one_point = false;
@@ -154,8 +151,8 @@ namespace Wpf_Matrices
                 textBox_typical_elt.Text = handled_str;
             }
         }
-         public static int amount_of_not_null_elts(int dim)//сумма от 1 до числа-1
-         {
+        public static int amount_of_not_null_elts(int dim)//сумма от 1 до числа-1
+        {
             int amount = 0;
 
             if (dim == 1)
@@ -164,15 +161,15 @@ namespace Wpf_Matrices
             }
             else
             {
-                for (int i = 1; i < dim; i++) // from 1 to figure -1 
+                for (int i = 1; i <= dim; i++) // from 1 to figure -1 
                 {
                     amount += i;
                 }
                 return amount;
             }
-         }
-         public bool validate_2Darray(string[,] array,int dim1,int dim2,string add_message)
-         {
+        }
+        public bool validate_2Darray(string[,] array, int dim1, int dim2, string add_message)
+        {
             for (int i = 0; i < dim1; i++)
             {
                 for (int j = 0; j < dim2; j++)
@@ -189,116 +186,460 @@ namespace Wpf_Matrices
                 }
             }
             return true;
-         }
-
-        //Логически важные методы (Лучше вынести в класс потом )
-        private void save_matrix_in_file(string File_path,string message)
+        }
+        public void remove_all_elts_combobox(ComboBox comboBox)//для combobox на первой странице
         {
-            
+            if (!(comboBox.Items.Count == 0))
+            {
+                if (comboBox.SelectedItem.ToString() == "System.Windows.Controls.ComboBoxItem: Значение однотипных элементов"
+                    || comboBox.SelectedItem.ToString() == "System.Windows.Controls.ComboBoxItem: Название")
+                {
+                    //это знач по умолчанию не удаляем  их
+                }
+                else
+                {
+                    comboBox.Items.Clear();
+                }
+            }
+            else; //он пуст
 
-                if ((TabItem_Normal_Form.IsSelected && validate_2Darray(array_inp, dimension, dimension, $"при {message} матрицы в файл  из Матричной формы")) ||
-                        (TabItem_Dense_Form.IsSelected && validate_2Darray(array_dense, amount_of_not_null_elts(dimension), 1, $"при {message}  матрицы в файл из Упакованной формы"))) //если в массивах только double числа
-                    using (var file = File.CreateText(File_path))
+        }
+        public void read_matrix_from_file(StreamReader file)//читает из файла элементы в упакованной форме в ГЛОБАЛЬНЫЙ массив array_dense ТОЛЬКО ДЛЯ сокращения кода
+        {
+            array_dense = new string[amount_of_not_null_elts(dimension), 1];
+            int i = 0;
+            int counter = 0;//по aray_dense
+            string line;
+            while ((line = file.ReadLine()) != null)
+            {
+                string[] str_elts = line.Split(' ');
+                int j = 0;
+                foreach (var item in str_elts)
+                {
+                    switch (orientation_number)
                     {
-                        file.WriteLine(dimension);
-                        file.WriteLine(orientation_number);
-                        file.WriteLine(typical_elt);
+                        case 1:
 
-                        if (TabItem_Normal_Form.IsSelected)
+                            if (i + j <= dimension - 1)
+                            {
+
+                                array_dense[counter, 0] = item;
+                                counter++;
+                            }
+                            else; //пустая строка
+
+                            break;
+
+                        case 2:
+
+                            if (i + j >= dimension - 1)
+                            {
+                                array_dense[counter, 0] = item;
+                                counter++;
+                            }
+                            else; //пустая строка
+                            break;
+
+                        case 3:
+
+                            if (i <= j)
+                            {
+                                array_dense[counter, 0] = item;
+                                counter++;
+                            }
+                            else; //пустая строка
+                            break;
+
+                        case 4:
+
+                            if (i >= j)
+                            {
+                                array_dense[counter, 0] = item;
+                                counter++;
+                            }
+                            else; //пустая строка
+                            break;
+
+                        default: throw new Exception("Не распознана ориентация для заполнения упакованной формы ");
+                    }
+                    j++;
+                }
+                i++;
+            }
+        }
+        public List<double> get_elts_in_list_from_file(string matrix_name,int orient,int dim)//заполняет в список элементы из файла 
+        {
+            using (var reader = new StreamReader(path_to_FS + matrix_name + ".txt"))
+            {
+                //пропуск размерности ориентации и однотип элемента
+                reader.ReadLine();
+                reader.ReadLine();
+                reader.ReadLine();
+
+                
+                List<double> list_from_file = new List<double>();
+                if (dim == 1)
+                {
+
+                    list_from_file.Add(Convert.ToDouble(reader.ReadLine()));
+                    return list_from_file;
+                }
+                else
+                {
+
+             
+                    string line;
+                    int i = 0;
+                    while ((line = reader.ReadLine())!= null)
+                    {
+                        string[] str_elts = line.Split(' ');
+                        int j = 0;
+                        foreach (var item in str_elts)
                         {
+                            switch (orient)
+                            {
+                                case 1:
 
+                                    if (i + j <= dim - 1)
+                                    {
+                                        list_from_file.Add(Convert.ToDouble(item));
+                                    }
+                                    else;
+                                    break;
+
+                                case 2:
+
+                                    if (i + j >= dim - 1)
+                                    {
+                                        list_from_file.Add(Convert.ToDouble(item));
+                                    }
+                                    else;
+                                    break;
+
+                                case 3:
+
+                                    if (i <= j)
+                                    {
+                                        list_from_file.Add(Convert.ToDouble(item));
+                                    }
+                                    else;
+                                    break;
+
+                                case 4:
+
+                                    if (i >= j)
+                                    {
+                                        list_from_file.Add(Convert.ToDouble(item));
+                                    }
+                                    else;
+                                    break;
+
+                                default: throw new Exception("Не распознана ориентация для заполнения упакованной формы ");
+                            }
+                            j++;
+                        }
+                        i++;
+                    }
+                return list_from_file;
+                }
+            }
+        }
+        public void show_result_matrix(List<double> list_result,int dim,int orient,double value_typ_elt,bool result_is_full_matrix)//отвечает за отображение матрицы в гриде на первой странице
+        {
+            Matrix_name_1st_page.Text = "МАТРИЦА - РЕЗУЛЬТАТ";
+            string[,] result_matrix = new string[dim, dim];
+
+            if (dim == 1)
+            {
+                result_matrix[0, 0] = list_result.ElementAt(0).ToString();
+            }
+            else
+            {
+                int counter = 0;//двигаемся по списку с ненулевыми эл-ми
+                string str_typ_elt = value_typ_elt.ToString();
+                if (result_is_full_matrix)
+                {
+                    for (int i = 0; i < dim; i++)
+                    {
+                        for (int j = 0; j < dim; j++)
+                        {
+                            result_matrix[i,j] = list_result.ElementAt(counter).ToString();
+                            counter++;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < dim; i++)
+                    {
+                        for (int j = 0; j < dim; j++)
+                        {
+                            switch (orient)
+                            {
+                                case 1:
+
+                                    if (i + j <= dim - 1)
+                                    {
+                                        result_matrix[i, j] = list_result.ElementAt(counter).ToString();
+                                        counter++;
+                                    }
+                                    else
+                                    {
+                                        result_matrix[i, j] = str_typ_elt;
+                                    }
+
+                                    break;
+
+                                case 2:
+
+                                    if (i + j >= dim - 1)
+                                    {
+                                        result_matrix[i, j] = list_result.ElementAt(counter).ToString();
+                                        counter++;
+                                    }
+                                    else
+                                    {
+                                        result_matrix[i, j] = str_typ_elt;
+                                    }
+
+                                    break;
+
+                                case 3:
+
+                                    if (i <= j)
+                                    {
+                                        result_matrix[i, j] = list_result.ElementAt(counter).ToString();
+                                        counter++;
+                                    }
+                                    else
+                                    {
+                                        result_matrix[i, j] = str_typ_elt;
+                                    }
+
+                                    break;
+
+                                case 4:
+
+                                    if (i >= j)
+                                    {
+                                        result_matrix[i, j] = list_result.ElementAt(counter).ToString();
+                                        counter++;
+                                    }
+                                    else
+                                    {
+                                        result_matrix[i, j] = str_typ_elt;
+                                    }
+                                    break;
+
+                                default: throw new Exception("Не распознана ориентация для заполнения упакованной формы ");
+                            }
+                        }
+                    }
+                }
+                
+               
+            }
+            dataGrid2D.ItemsSource2D = result_matrix;
+          
+        }
+        public void choose_operation_of_M1_and_M2 (char operation,string matrix_name1, string matrix_name2,int dim,int orient,double val_typ_elt)//производит выбор функции в зависимости от перации
+        {
+            Sparse_Matrix sparse_m = new Sparse_Matrix();
+            switch (operation)
+            {
+                case '+':
+                    double chnged_val_typ_elt = val_typ_elt;
+                    if (val_typ_elt != 0)
+                    {
+                        chnged_val_typ_elt = val_typ_elt*2;
+                    }
+                    else;//нам не надо его удваивать
+                    show_result_matrix(sparse_m.triangular_matrix_sum(get_elts_in_list_from_file(matrix_name1,orient,dim), get_elts_in_list_from_file(matrix_name2,orient,dim)),
+                                       dim, orient, chnged_val_typ_elt,false);
+                break;
+                    
+                case '-':
+                    val_typ_elt = 0;//при вычитании однотипный элемент будет получаться всегда 0 в результате
+                   show_result_matrix( sparse_m.triangular_matrix_sub(get_elts_in_list_from_file(matrix_name1,orient,dim), get_elts_in_list_from_file(matrix_name2,orient,dim)),
+                                       dim,orient,val_typ_elt,false);
+                break;
+
+                case '*':
+                    switch (val_typ_elt)
+                    {
+                        case 0:
+                            switch (orient)
+                            {
+                                case 1:
+                                    show_result_matrix(sparse_m.upper_triangular_matrix_secondary_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim), 
+                                                          get_elts_in_list_from_file(matrix_name2, orient, dim), dim),
+                                       dim, orient, val_typ_elt, true);
+                                    break;
+                                    
+                                case 2:
+                                    show_result_matrix(sparse_m.lower_triangular_matrix_secondary_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim), 
+                                                          get_elts_in_list_from_file(matrix_name2, orient, dim), dim),
+                                       dim, orient, val_typ_elt, true);
+                                    break;
+                                    
+                                case 3:
+                                    show_result_matrix(sparse_m.upper_triangular_matrix_major_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim), 
+                                                       get_elts_in_list_from_file(matrix_name2, orient, dim), dim),
+                                        dim, orient, val_typ_elt,false);
+                                    break;
+                                    
+                                case 4:
+                                    show_result_matrix(sparse_m.lower_triangular_matrix_major_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim), 
+                                                      get_elts_in_list_from_file(matrix_name2, orient, dim), dim),
+                                     dim, orient, val_typ_elt,false);
+                                    break;
+                                default:throw new Exception("Ориентацию при попытке умножения не удалось распознать!");
+                            }
+                            break;
+
+                        
+                        default:
+                            switch (orient)
+                            {
+                                case 1:
+                                    show_result_matrix(sparse_m.triangular_matrix__any_diagonal_not_nulls_multiplication(get_elts_in_list_from_file(matrix_name1, orient, dim),
+                                                       get_elts_in_list_from_file(matrix_name2, orient, dim), dim, val_typ_elt, "up_secondary"),
+                                    dim, orient, val_typ_elt, true);
+                                    break;
+                                case 2:
+                                    show_result_matrix(sparse_m.triangular_matrix__any_diagonal_not_nulls_multiplication(get_elts_in_list_from_file(matrix_name1, orient, dim),
+                                                       get_elts_in_list_from_file(matrix_name2, orient, dim), dim, val_typ_elt, "low_secondary"),
+                                    dim, orient, val_typ_elt, true);
+                                    break;
+                                case 3:
+                                    show_result_matrix(sparse_m.triangular_matrix__any_diagonal_not_nulls_multiplication(get_elts_in_list_from_file(matrix_name1, orient, dim),
+                                                       get_elts_in_list_from_file(matrix_name2, orient, dim), dim, val_typ_elt, "up_major"),
+                                    dim, orient, val_typ_elt, true);
+                                    break;
+                                case 4:
+                                    show_result_matrix(sparse_m.triangular_matrix__any_diagonal_not_nulls_multiplication(get_elts_in_list_from_file(matrix_name1, orient, dim),
+                                                       get_elts_in_list_from_file(matrix_name2, orient, dim), dim, val_typ_elt, "low_secondary"),
+                                    dim, orient, val_typ_elt, true);
+                                    break;
+                                
+                                default:
+                                    break; throw new Exception("Ориентация при попытке умножения не распознана!");
+                            }
+                            break;
+                    }
+                    break;
+
+                default:
+                    throw new Exception("Операция была не распознана");
+            }
+        }
+        //Логически важные методы (Лучше вынести в класс потом )
+        private void save_matrix_in_file(string File_path, string message)
+        {
+
+
+            if ((TabItem_Normal_Form.IsSelected && validate_2Darray(array_inp, dimension, dimension, $"при {message} матрицы в файл  из Матричной формы")) ||
+                    (TabItem_Dense_Form.IsSelected && validate_2Darray(array_dense, amount_of_not_null_elts(dimension), 1, $"при {message}  матрицы в файл из Упакованной формы"))) //если в массивах только double числа
+                using (var file = File.CreateText(File_path))
+                {
+                    file.WriteLine(dimension);
+                    file.WriteLine(orientation_number);
+                    file.WriteLine(typical_elt);
+
+                    if (TabItem_Normal_Form.IsSelected)
+                    {
+
+                        for (int i = 0; i < dimension; i++)
+                        {
+                            string row_buffer = "";
+                            for (int j = 0; j < dimension; j++)
+                            {
+                                row_buffer += array_inp[i, j] + " ";
+                            }
+                            file.WriteLine(row_buffer.TrimEnd(' '));
+                        }
+                        MessageBox.Show("Файл с матрицей успешно сохранен!");
+                    }
+                    else
+                    {
+                        if (TabItem_Dense_Form.IsSelected)//если матрица в норм форме и все элементы - double
+                        {
+                            int counter = 0;//обращение к упакованному массиву
                             for (int i = 0; i < dimension; i++)
                             {
                                 string row_buffer = "";
                                 for (int j = 0; j < dimension; j++)
                                 {
-                                    row_buffer += array_inp[i, j] + " ";
+                                    switch (orientation_number)
+                                    {
+                                        case 1:
+
+                                            if (i + j <= dimension - 1)
+                                            {
+                                                row_buffer += array_dense[counter, 0] + " ";
+                                                counter++;
+                                            }
+                                            else
+                                            {
+                                                row_buffer += typical_elt.ToString() + " ";
+                                            }
+                                            break;
+
+                                        case 2:
+
+                                            if (i + j >= dimension - 1)
+                                            {
+                                                row_buffer += array_dense[counter, 0] + " ";
+                                                counter++;
+                                            }
+                                            else
+                                            {
+                                                row_buffer += typical_elt.ToString() + " ";
+                                            }
+                                            break;
+
+                                        case 3:
+
+                                            if (i <= j)
+                                            {
+                                                row_buffer += array_dense[counter, 0] + " ";
+                                                counter++;
+                                            }
+                                            else
+                                            {
+                                                row_buffer += typical_elt.ToString() + " ";
+                                            }
+                                            break;
+
+                                        case 4:
+
+                                            if (i >= j)
+                                            {
+                                                row_buffer += array_dense[counter, 0] + " ";
+                                                counter++;
+                                            }
+                                            else
+                                            {
+                                                row_buffer += typical_elt.ToString() + " ";
+                                            }
+                                            break;
+
+                                        default: throw new Exception("Не распознана ориентация для заполнения упакованной формы при записи в файл ");
+                                    }
                                 }
                                 file.WriteLine(row_buffer.TrimEnd(' '));
                             }
                             MessageBox.Show("Файл с матрицей успешно сохранен!");
                         }
-                        else
-                        {
-                            if (TabItem_Dense_Form.IsSelected)//если матрица в норм форме и все элементы - double
-                            {
-                                int counter = 0;//обращение к упакованному массиву
-                                for (int i = 0; i < dimension; i++)
-                                {
-                                    string row_buffer = "";
-                                    for (int j = 0; j < dimension; j++)
-                                    {
-                                        switch (orientation_number)
-                                        {
-                                            case 1:
-
-                                                if (i + j < dimension - 1)
-                                                {
-                                                    row_buffer += array_dense[counter, 0] + " ";
-                                                    counter++;
-                                                }
-                                                else
-                                                {
-                                                    row_buffer += typical_elt.ToString() + " ";
-                                                }
-                                                break;
-
-                                            case 2:
-
-                                                if (!(i + j < dimension))
-                                                {
-                                                    row_buffer += array_dense[counter, 0] + " ";
-                                                    counter++;
-                                                }
-                                                else
-                                                {
-                                                    row_buffer += typical_elt.ToString() + " ";
-                                                }
-                                                break;
-
-                                            case 3:
-
-                                                if (!(i >= j))
-                                                {
-                                                    row_buffer += array_dense[counter, 0] + " ";
-                                                    counter++;
-                                                }
-                                                else
-                                                {
-                                                    row_buffer += typical_elt.ToString() + " ";
-                                                }
-                                                break;
-
-                                            case 4:
-
-                                                if (!(i <= j))
-                                                {
-                                                    row_buffer += array_dense[counter, 0] + " ";
-                                                    counter++;
-                                                }
-                                                else
-                                                {
-                                                    row_buffer += typical_elt.ToString() + " ";
-                                                }
-                                                break;
-
-                                            default: throw new Exception("Не распознана ориентация для заполнения упакованной формы при записи в файл ");
-                                        }
-                                    }
-                                    file.WriteLine(row_buffer.TrimEnd(' '));
-                                }
-                                MessageBox.Show("Файл с матрицей успешно сохранен!");
-                            }
-                            else;
-                        }
-
+                        else;
                     }
-            }
 
+                }
+        }
 
         private void Save_Matrix_Dialog(object sender, System.Windows.RoutedEventArgs e)
         {
-       
+
             WpfApp1.Window_save_result_matrix window_Save_Result = new WpfApp1.Window_save_result_matrix();
             window_Save_Result.ShowDialog();
         }
@@ -329,7 +670,7 @@ namespace Wpf_Matrices
             // Display OpenFileDialog by calling ShowDialog method 
             Nullable<bool> result = dlg.ShowDialog();
 
-           
+
             if (result == true)
             {
                 using (var file = new StreamReader(dlg.FileName))
@@ -348,7 +689,7 @@ namespace Wpf_Matrices
                         try
                         {
                             local_dimension = Convert.ToInt32(line);
-                            if (local_dimension > 0 && local_dimension <=100000)
+                            if (local_dimension > 0 && local_dimension <= 100000)
                             {
 
                             }
@@ -369,7 +710,7 @@ namespace Wpf_Matrices
                             try
                             {
                                 local_orientation_number = Convert.ToInt32(line);
-                                if (local_orientation_number>0 && local_orientation_number<=4)
+                                if (local_orientation_number > 0 && local_orientation_number <= 4)
                                 {
 
                                 }
@@ -434,12 +775,12 @@ namespace Wpf_Matrices
                                     //TODO: ДОБАВИТЬ ПРОВЕРКУ НА ОРИЕНТАЦИя но ОНА будет много жрать ЦП так как проверить нужно все элементы 
                                     //все в порядке то добавим в список и надо ли считывать?
                                     MessageBox.Show("Матрица в файле валидна");
-                                    cancel_handle_norm_form = true;
+                                    //cancel_handle_norm_form = true;
                                     TabItem_Dense_Form.IsSelected = true;
 
                                     using (var file2 = new StreamReader(dlg.FileName))//второй раз открываю файл чтобы уже считать,так как он был проверен
                                     {
-                                     //Пропустим размерность, ориентацию и однотип эл-нт   
+                                        //Пропустим размерность, ориентацию и однотип эл-нт   
                                         file2.ReadLine();
                                         file2.ReadLine();
                                         file2.ReadLine();
@@ -451,69 +792,11 @@ namespace Wpf_Matrices
                                         NumericUpDown.Value = dimension;
                                         textBox_typical_elt.Text = typical_elt.ToString();
                                         Image_OR.Source = orientations[index_image];
-                                       //выделим память
-                                        array_dense = new string[amount_of_not_null_elts(dimension), 1];
-                                        int i = 0;
-                                        int counter = 0;//по aray_dense
-                                        while ((line = file2.ReadLine()) != null)
-                                        {
-                                            string[] str_elts = line.Split(' ');
-                                            int j = 0;
-                                            foreach (var item in str_elts)
-                                            {
-                                                switch (orientation_number)
-                                                {
-                                                    case 1:
 
-                                                        if (i + j < dimension - 1)
-                                                        {
-
-                                                            array_dense[counter, 0] = item;
-                                                            counter++;
-                                                        }
-                                                        else; //пустая строка
-
-                                                        break;
-
-                                                    case 2:
-
-                                                        if (!(i + j < dimension))
-                                                        {
-                                                            array_dense[counter, 0] = item;
-                                                            counter++;
-                                                        }
-                                                        else; //пустая строка
-                                                        break;
-
-                                                    case 3:
-
-                                                        if (!(i >= j))
-                                                        {
-                                                            array_dense[counter, 0] = item;
-                                                            counter++;
-                                                        }
-                                                        else; //пустая строка
-                                                        break;
-
-                                                    case 4:
-
-                                                        if (!(i <= j))
-                                                        {
-                                                            array_dense[counter, 0] = item;
-                                                            counter++;
-                                                        }
-                                                        else; //пустая строка
-                                                        break;
-
-                                                    default: throw new Exception("Не распознана ориентация для заполнения упакованной формы ");
-                                                }
-                                                j++;
-                                            }
-                                            i++;
-                                        }
-                                        
+                                        read_matrix_from_file(file2);
                                         dataGrid2D_sec_page.ItemsSource2D = array_dense;
                                         MessageBox.Show("Файл с матрицей успешно открыт!");
+                                        Label_Matrix_Name.Text = "Матрица из ФАЙЛА";
                                     }
                                 }
                             }
@@ -534,7 +817,7 @@ namespace Wpf_Matrices
                         MessageBox.Show("Файл пуст!");
                     }
                 }
-               
+
             }
         }
 
@@ -562,17 +845,17 @@ namespace Wpf_Matrices
 
         private void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
-           
-            if(!string.IsNullOrEmpty( e.Text) )
-            if ( char.IsDigit(e.Text[0]) || e.Text[0]=='.' || e.Text[0]=='-')
-            {
 
-            }
-            else
-            {
-                e.Handled = true;//Значение true для обхода обработки элемента управления по умолчанию;
-            }
-        }    
+            if (!string.IsNullOrEmpty(e.Text))
+                if (char.IsDigit(e.Text[0]) || e.Text[0] == '.' || e.Text[0] == '-')
+                {
+
+                }
+                else
+                {
+                    e.Handled = true;//Значение true для обхода обработки элемента управления по умолчанию;
+                }
+        }
 
         private void Button_Click_Create_Matrix(object sender, RoutedEventArgs e)
         {
@@ -601,6 +884,7 @@ namespace Wpf_Matrices
                         array_inp = new string[dimension, dimension];
                         fill_array_depend_on_orient(array_inp, dimension, orientation_number, typical_elt);
                         dataGrid2D_sec_page.ItemsSource2D = array_inp;
+                        Label_Matrix_Name.Text = "НЕСОХРАНЕННАЯ МАТРИЦА";
                         MessageBox.Show("Матрица создана успешно!");
                     }
                     //TODO:
@@ -632,7 +916,7 @@ namespace Wpf_Matrices
             {
                 if (TabItem_Dense_Form.IsSelected)
                 {
-                    MessageBoxResult    boxResult= MessageBox.Show("Вы уверены что хотите создать новую матрицу в упакованной форме?", "ВОЗМОЖНАЯ ПОТЕРЯ ДАННЫХ", MessageBoxButton.YesNo);
+                    MessageBoxResult boxResult = MessageBox.Show("Вы уверены что хотите создать новую матрицу в упакованной форме?", "ВОЗМОЖНАЯ ПОТЕРЯ ДАННЫХ", MessageBoxButton.YesNo);
                     if (boxResult == MessageBoxResult.Yes)
                     {
                         try
@@ -641,7 +925,7 @@ namespace Wpf_Matrices
                             int tmp_number_orientation = index_image + 1;
                             double tmp_typical_elt = Convert.ToDouble(textBox_typical_elt.Text);
 
-                            if (amount_of_not_null_elts(tmp_dimension)>1000000)
+                            if (amount_of_not_null_elts(tmp_dimension) > 1000000)
                             {
                                 messageBoxResult = MessageBox.Show("Количество эл-ов превышает 1000000,поэтому след эл-ты будут отображаться отдельно ", "ОЧЕНЬ БОЛЬШОЕ КОЛИЧЕСТВО ЭЛЕМЕНТОВ", MessageBoxButton.YesNoCancel);
                             }
@@ -650,8 +934,9 @@ namespace Wpf_Matrices
                                 dimension = tmp_dimension;
                                 orientation_number = tmp_number_orientation;
                                 typical_elt = tmp_typical_elt;
-                                array_dense = new string[amount_of_not_null_elts(dimension), 1];             
+                                array_dense = new string[amount_of_not_null_elts(dimension), 1];
                                 dataGrid2D_sec_page.ItemsSource2D = array_dense;
+                                Label_Matrix_Name.Text = "НЕСОХРАНЕННАЯ МАТРИЦА";
                             }
                             if (messageBoxResult == MessageBoxResult.Yes)
                             {
@@ -659,14 +944,13 @@ namespace Wpf_Matrices
                                 orientation_number = tmp_number_orientation;//то же самое с ориентацией
                                 typical_elt = tmp_typical_elt;//и с элементом однотипным
                                 array_dense = new string[amount_of_not_null_elts(dimension), 1];
-                             //   array_inp = new string[dimension, dimension];//TODO:потеря в памяти если пользователь не заахочет переключаться на полную форму
-                              //  fill_array_depend_on_orient(array_inp, dimension, orientation_number, typical_elt);
                                 dataGrid2D_sec_page.ItemsSource2D = array_dense;
+                                Label_Matrix_Name.Text = "НЕСОХРАНЕННАЯ МАТРИЦА";
                                 MessageBox.Show("Матрица в упакованной форме создана успешно!");
                             }
                             else;//NO
                         }
-                        catch ( OutOfMemoryException)
+                        catch (OutOfMemoryException)
                         {
                             throw new OutOfMemoryException();
                         }
@@ -711,7 +995,7 @@ namespace Wpf_Matrices
                             {
                                 case 1:
 
-                                    if (i + j < dimension - 1)
+                                    if (i + j <= dimension - 1)
                                     {
 
                                         array_dense[counter, 0] = array_inp[i, j];
@@ -723,7 +1007,7 @@ namespace Wpf_Matrices
 
                                 case 2:
 
-                                    if (!(i + j < dimension))
+                                    if (i + j >= dimension - 1)
                                     {
                                         array_dense[counter, 0] = array_inp[i, j];
                                         counter++;
@@ -733,7 +1017,7 @@ namespace Wpf_Matrices
 
                                 case 3:
 
-                                    if (!(i >= j))
+                                    if (i <= j)
                                     {
                                         array_dense[counter, 0] = array_inp[i, j];
                                         counter++;
@@ -743,7 +1027,7 @@ namespace Wpf_Matrices
 
                                 case 4:
 
-                                    if (!(i <= j))
+                                    if (i >= j)
                                     {
                                         array_dense[counter, 0] = array_inp[i, j];
                                         counter++;
@@ -763,12 +1047,12 @@ namespace Wpf_Matrices
                 }
                 dataGrid2D_sec_page.ItemsSource2D = array_dense;
             }
-           
+
         }
 
         private void TabItem_GotFocus_Matrix_Form(object sender, RoutedEventArgs e)
         {
-            if (dimension>1000)
+            if (dimension > 1000)
             {
                 if (MessageBox.Show("В матричной форме элементы займут ОЧЕНЬ много времени на вывод и памяти, ВЫ УВЕРЕНЫ ЧТО ХОТИТЕ ПРОДОЛЖИТЬ?",
                                   "ОЧЕНЬ БОЛЬШАЯ РАЗМЕРНОСТЬ", MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
@@ -778,7 +1062,7 @@ namespace Wpf_Matrices
                     dataGrid2D_sec_page.ItemsSource2D = array_inp;
                 }
                 else
-                { 
+                {
                     cancel_handle_norm_form = true;
                     TabItem_Dense_Form.IsSelected = true;
                 }
@@ -800,7 +1084,7 @@ namespace Wpf_Matrices
                             {
                                 case 1:
 
-                                    if (i + j < dimension - 1)
+                                    if (i + j <= dimension - 1)
                                     {
                                         array_inp[i, j] = array_dense[counter, 0];
                                         counter++;
@@ -811,7 +1095,7 @@ namespace Wpf_Matrices
 
                                 case 2:
 
-                                    if (!(i + j < dimension))
+                                    if (i + j >= dimension - 1)
                                     {
                                         array_inp[i, j] = array_dense[counter, 0];
                                         counter++;
@@ -821,7 +1105,7 @@ namespace Wpf_Matrices
 
                                 case 3:
 
-                                    if (!(i >= j))
+                                    if (i <= j)
                                     {
                                         array_inp[i, j] = array_dense[counter, 0];
                                         counter++;
@@ -831,7 +1115,7 @@ namespace Wpf_Matrices
 
                                 case 4:
 
-                                    if (!(i <= j))
+                                    if (i >= j)
                                     {
                                         array_inp[i, j] = array_dense[counter, 0];
                                         counter++;
@@ -852,15 +1136,15 @@ namespace Wpf_Matrices
 
                 dataGrid2D_sec_page.ItemsSource2D = array_inp;
             }
-            
-            
+
+
 
         }
 
         private void Button_Click_Auto_Fill(object sender, RoutedEventArgs e)
         {
             Random random = new Random();
-            if (TabItem_Normal_Form .IsSelected)
+            if (TabItem_Normal_Form.IsSelected)
             {
                 for (int i = 0; i < dimension; i++)
                 {
@@ -868,19 +1152,12 @@ namespace Wpf_Matrices
                     {
                         if (string.IsNullOrEmpty(array_inp[i, j]))
                         {
-                            array_inp[i, j] = ( random.Next() + random.NextDouble() ).ToString();
+                            array_inp[i, j] = (random.Next() + random.NextDouble()).ToString();
                         }
                         else;//не заполняем непустые
                     }
                 }
-
-                if (dimension < 100)
-                {
-                    dataGrid2D_sec_page.ItemsSource2D = new string[0,0];
-                    dataGrid2D_sec_page.ItemsSource2D = array_inp;
-                }
-                else;
-                
+                dataGrid2D_sec_page.Items.Refresh();
             }
             else
             {
@@ -894,23 +1171,19 @@ namespace Wpf_Matrices
                         }
                         else;//не заполняем непустые
                     }
-                    if (dimension < 100)
-                    {
-                        dataGrid2D_sec_page.ItemsSource2D = new string[0, 0];
-                        dataGrid2D_sec_page.ItemsSource2D = array_dense;
-                    }
-                    else;
+
+                    dataGrid2D_sec_page.Items.Refresh();
                 }
                 else;//адреса не реализованы(((((
             }
-            
+
             MessageBox.Show("Матрица успешно заполнена случайными числами");
         }
 
         private void Button_Click_Add_To_List(object sender, RoutedEventArgs e)
         {
-            
-            
+
+
             if (TabItem_Normal_Form.IsSelected)
             {
                 for (int i = 0; i < dimension; i++)
@@ -946,11 +1219,11 @@ namespace Wpf_Matrices
             Matrix_name_pop_up.ShowDialog();
             if (Matrix_name_pop_up.IsCancelled)
             {
-               //ничего не делаем
+                //ничего не делаем
             }
             else
             {
-                string Matrix_name = Matrix_name_pop_up.get_Matrix_name;
+                string Matrix_name = Matrix_name_pop_up.get_Matrix_name;//TODO: ДОБАВИТЬ ВАЛИДАЦИЮ
                 if (string.IsNullOrEmpty(Matrix_name))
                 {
                     MessageBox.Show("Имя матрицы не может быть пустым!");
@@ -962,18 +1235,20 @@ namespace Wpf_Matrices
                     {
                         save_matrix_in_file(path_to_FS + Matrix_name + ".txt", "добавлении");
                         list_matrices.Add(Matrix_name);
-                        List_Matrices.ItemsSource = new List<string>();//чтобы при обновлении списка обновлялся интерфейс
+                        list_matrices_orient.Add(orientation_number);
+                        list_matrices_typic_elt.Add(typical_elt.ToString());
+                        List_Matrices.Items.Refresh();
                         List_Matrices.ItemsSource = list_matrices;
                         Label_Matrix_Name.Text = Matrix_name;
                     }
                     else
                     {
-                        MessageBox.Show("Матрица с таким названием уже существует!","ОШИБКА ПРИ ДОБАВЛЕНИИ МАТРИЦЫ");
+                        MessageBox.Show("Матрица с таким названием уже существует!", "ОШИБКА ПРИ ДОБАВЛЕНИИ МАТРИЦЫ");
                     }
-                    
+
                 }
             }
-            
+
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -991,14 +1266,14 @@ namespace Wpf_Matrices
                     left_elts.Add(item.ToString());
                 }
             }
-            List_Matrices.ItemsSource =  sorted_list.Concat(left_elts);
+            List_Matrices.ItemsSource = sorted_list.Concat(left_elts);
         }
 
         private void Button_Click_delete_from_Matrix_List(object sender, RoutedEventArgs e)
         {
             string file_path = path_to_FS + List_Matrices.SelectedItem + ".txt";
 
-            if (List_Matrices.SelectedItem is  null)
+            if (List_Matrices.SelectedItem is null)
             {
                 //ничего не делаем
             }
@@ -1006,7 +1281,7 @@ namespace Wpf_Matrices
             {
                 if (File.Exists(file_path))
                 {
-                    
+
                     if (MessageBox.Show($"Вы уверены что хотите удалить матрицу \"{List_Matrices.SelectedItem}\"?", "Подтвердите удаление", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
 
@@ -1015,30 +1290,36 @@ namespace Wpf_Matrices
                             Label_Matrix_Name.Text = "СОЗДАЙТЕ или ВЫБЕРИТЕ матрицу";//мы в файле удалили но не в ОП оставили
                         }
                         else;//просто удалим
-                        
-                        
+
+
                         File.Delete(file_path);
+                        int index_of_elt_in_list = list_matrices.IndexOf(List_Matrices.SelectedItem.ToString());
                         list_matrices.Remove(List_Matrices.SelectedItem.ToString());
-                        List_Matrices.ItemsSource = new List<string>();
+                        list_matrices_orient.RemoveAt(index_of_elt_in_list);
+                        list_matrices_typic_elt.RemoveAt(index_of_elt_in_list);
+                        List_Matrices.Items.Refresh();
                         List_Matrices.ItemsSource = list_matrices;
                         MessageBox.Show("Матрица успешно удалена");
                     }
                     else
                     {
-                         //мы ничего не удаляем
+                        //мы ничего не удаляем
                     }
-                    
+
                 }
                 else//если файла нет то, удалим его из списка раз пользователь влез в файловый каталог проги 
                 {
                     MessageBox.Show("Матрица для удаления не найдена!");
+                    int index_of_matrix_in_list = list_matrices.IndexOf(List_Matrices.SelectedItem.ToString());
                     list_matrices.Remove(List_Matrices.SelectedItem.ToString());
-                    List_Matrices.ItemsSource = new List<string>();
+                    list_matrices_orient.RemoveAt(index_of_matrix_in_list);
+                    list_matrices_typic_elt.RemoveAt(index_of_matrix_in_list);
+                    List_Matrices.Items.Refresh();
                     List_Matrices.ItemsSource = list_matrices;
                 }
-              
+
             }
-            
+
         }
 
         private void List_Matrices_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -1052,12 +1333,34 @@ namespace Wpf_Matrices
                 if (List_Matrices.SelectedItem.ToString() == Label_Matrix_Name.Text)
                 {
                     //матрица и так уже выбрана
+
+                    if (MessageBoxResult.Yes == MessageBox.Show($"Обновить матрицу {Label_Matrix_Name.Text}", "Повторное нажтие", MessageBoxButton.YesNo))
+                    {
+                        cancel_handle_norm_form = true;
+                        TabItem_Dense_Form.IsSelected = true;
+                        using (var file = new StreamReader(path_to_FS + List_Matrices.SelectedItem + ".txt"))
+                        {
+                            dimension = Convert.ToInt32(file.ReadLine());
+                            orientation_number = Convert.ToInt32(file.ReadLine());
+                            typical_elt = Convert.ToDouble(file.ReadLine());
+                            index_image = orientation_number - 1;
+                            NumericUpDown.Value = dimension;
+                            Image_OR.Source = orientations[index_image];
+                            textBox_typical_elt.Text = typical_elt.ToString();
+
+                            //TODO : ТЕСТЫ НУЖНЫ ВЫНЕСТИ КУСОК КОДА НИЖЕ в отдельную функция так как 2 раза повторяется
+                            read_matrix_from_file(file);
+                            dataGrid2D_sec_page.ItemsSource2D = array_dense;
+                            Label_Matrix_Name.Text = List_Matrices.SelectedItem.ToString();
+                            MessageBox.Show($"Матрица \"{List_Matrices.SelectedItem}\" успешно прогружена!");
+                        }
+                    }
+                    else;//значит обновлять не надо
                 }
                 else
                 {
                     cancel_handle_norm_form = true;
                     TabItem_Dense_Form.IsSelected = true;
-                    string line = "";
                     using (var file = new StreamReader(path_to_FS + List_Matrices.SelectedItem + ".txt"))
                     {
                         dimension = Convert.ToInt32(file.ReadLine());
@@ -1067,72 +1370,14 @@ namespace Wpf_Matrices
                         NumericUpDown.Value = dimension;
                         Image_OR.Source = orientations[index_image];
                         textBox_typical_elt.Text = typical_elt.ToString();
-                        
-                        //TODO : ВЫНЕСТИ КУСОК КОДА НИЖЕ в отдельную функция так как 2 раза повторяется
-                        array_dense = new string[amount_of_not_null_elts(dimension), 1];
-                        int i = 0;
-                        int counter = 0;//по aray_dense
-                        while ((line = file.ReadLine()) != null)
-                        {
-                            string[] str_elts = line.Split(' ');
-                            int j = 0;
-                            foreach (var item in str_elts)
-                            {
-                                switch (orientation_number)
-                                {
-                                    case 1:
 
-                                        if (i + j < dimension - 1)
-                                        {
-
-                                            array_dense[counter, 0] = item;
-                                            counter++;
-                                        }
-                                        else; //пустая строка
-
-                                        break;
-
-                                    case 2:
-
-                                        if (!(i + j < dimension))
-                                        {
-                                            array_dense[counter, 0] = item;
-                                            counter++;
-                                        }
-                                        else; //пустая строка
-                                        break;
-
-                                    case 3:
-
-                                        if (!(i >= j))
-                                        {
-                                            array_dense[counter, 0] = item;
-                                            counter++;
-                                        }
-                                        else; //пустая строка
-                                        break;
-
-                                    case 4:
-
-                                        if (!(i <= j))
-                                        {
-                                            array_dense[counter, 0] = item;
-                                            counter++;
-                                        }
-                                        else; //пустая строка
-                                        break;
-
-                                    default: throw new Exception("Не распознана ориентация для заполнения упакованной формы ");
-                                }
-                                j++;
-                            }
-                            i++;
-                        }
+                        //TODO : ТЕСТЫ НУЖНЫ ВЫНЕСТИ КУСОК КОДА НИЖЕ в отдельную функция так как 2 раза повторяется
+                        read_matrix_from_file(file);
                         dataGrid2D_sec_page.ItemsSource2D = array_dense;
                         Label_Matrix_Name.Text = List_Matrices.SelectedItem.ToString();
                         MessageBox.Show($"Матрица \"{List_Matrices.SelectedItem}\" успешно прогружена!");
                     }
-                
+
                 }
             }
 
@@ -1143,6 +1388,280 @@ namespace Wpf_Matrices
             e.Handled = true;
             throw new NotImplementedException();
         }
+        bool first_call_miss = false;//пропустить первый раз при загрузке
+        private void ComboBox_orientation_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (first_call_miss)
+            {
+                //очистить combobox с ориентацией и однотип элементом
+                remove_all_elts_combobox(ComboBox_common_elts);
+                remove_all_elts_combobox(comboBox_name);
+
+                List<string> unique_typ_elts_value = new List<string>();//хранятся значения однотипных элементов
+                int index = 0;//проходимся по всем элементам списка list_matrices_orient
+                foreach (var item in list_matrices_orient)
+                {
+
+                    if (item == ComboBox_orientation.SelectedIndex)//ЕСЛИ МАТРИЦА ИМЕЕТ ВЫБРАННУЮ ОРИЕНТАЦИЮ
+                    {
+                        unique_typ_elts_value.Add(list_matrices_typic_elt.ElementAt(index));
+                    }
+                    else;//ненужная ориентация
+                    index++;
+                }
+
+                foreach (var item in unique_typ_elts_value.Distinct())//добавимс только различные элементы
+                {
+                    ComboBox_common_elts.Items.Add(item);
+                }
+            }
+            else
+            {
+                first_call_miss = true;
+            }
+
+        }
+
+        bool first_call_miss2 = false;//пропустить первый раз при загрузке
+        private void ComboBox_common_elts_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            if (first_call_miss2)
+            {
+                if (ComboBox_common_elts.Items.Count != 0)
+                {
+                    remove_all_elts_combobox(comboBox_name); //очистка чтобы имена старые удалялись 
+
+                    List<string> typ_elts_value = new List<string>();//хранятся  значения однотипных элементов
+                    List<int> indexes_of_elts_in_full_list = new List<int>();//индексы для списка выше
+                    int index = 0;//проходимся по всем элементам списка list_matrices_orient
+                    foreach (var item in list_matrices_orient)
+                    {
+
+                        if (item == ComboBox_orientation.SelectedIndex)//ЕСЛИ МАТРИЦА ИМЕЕТ ВЫБРАННУЮ ОРИЕНТАЦИЮ
+                        {
+                            typ_elts_value.Add(list_matrices_typic_elt.ElementAt(index));
+                            indexes_of_elts_in_full_list.Add(index);
+                        }
+                        else;//ненужная ориентация
+                        index++;
+                    }
+
+                    int count = 0;
+                    foreach (var item in typ_elts_value)//пройдемся по всему списку всех однотипных эл-тов
+                    {
+                        if (item == ComboBox_common_elts.SelectedItem.ToString())
+                        {
+                            int index_for_name = indexes_of_elts_in_full_list.ElementAt(count);//индекс для элемента из всего списка
+                            comboBox_name.Items.Add(list_matrices.ElementAt(index_for_name));//добавим элемент по этому индексу
+                        }
+                        else;
+                        count++;
+                    }
+                }
+                else
+                {
+                    ComboBox_common_elts.Foreground = Brushes.Gray;
+                    comboBox_name.Foreground = Brushes.Gray;
+
+                }//ничего не делаем
+
+
+
+            }
+            else
+            {
+                first_call_miss2 = true;
+            }
+        }
+
+        private void comboBox_name_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!(comboBox_name.SelectedItem is null) && comboBox_name.SelectedItem.ToString() != "System.Windows.Controls.ComboBoxItem: Название")//TODO: ЕБУЧИЙ КОСТЫЛЬ ТАК КАК ЕСЛИ ПОЛЬЗОВАТЕЛЬ ВВЕДЕТ НАЗВАНИЕ КАК В ПРОВЕРКЕ, ТО ОН НЕ СМОЖЕТ С НЕЙ РАБОТАТЬ
+            {
+
+                using (var file = new StreamReader(path_to_FS + comboBox_name.SelectedItem.ToString() + ".txt"))
+                {
+                    //Пропуск инф-ции о матрице
+                    int dim =Convert.ToInt32(file.ReadLine());
+                    file.ReadLine();
+                    file.ReadLine();
+                    string[,] array_in_normal_form = new string[dim, dim];
+                    string line = "";
+                    int i = 0;
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        int j = 0;
+                        string[] str_elts = line.Split(' ');
+                        foreach (var item in str_elts)
+                        {
+                            array_in_normal_form[i, j] = item;
+                            j++;
+                        }
+                        i++;
+                    }
+                    dataGrid2D.ItemsSource2D = array_in_normal_form;
+                    Matrix_name_1st_page.Text = comboBox_name.SelectedItem.ToString();
+                }
+            }
+            else;//значит нечего выводить
+        }
+
+        private void Button_Click_Expression(object sender, RoutedEventArgs e)
+        {
+            string expr = txtBox_Expression.Text.Trim();
+            if (!string.IsNullOrEmpty(expr))
+            if (expr[0]=='~')
+            {
+                    int i = 1;
+                    string matrix_rev = "";
+                    while (i< expr.Length &&  char.IsLetterOrDigit(expr[i]) )
+                    {
+                        matrix_rev += expr[i];    
+                        i++;
+                    }
+
+                    if (expr.Length == i)
+                    {
+                        //TODO:     //все хорошо
+                        throw new NotImplementedException("Сережа ответственен?");
+                    }
+                    else
+                    {
+                        MessageBox.Show("После имени матрицы содержатся лишние символы!", "ОШИБКА ПРИ НАХОЖДЕНИИ ОБРАТНОЙ МАТРИЦЫ");
+                    }
+            }
+            else
+            {
+                    int i = 0;
+                    string matrix_1 = "";//первая матрица
+                    while (char.IsLetterOrDigit(expr[i]))
+                    {
+                        if (i<expr.Length)
+                        {
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("НЕ ХВАТАЕТ оператора и второй матрицы");
+                            return;
+                        }
+                        matrix_1 += expr[i];
+                        i++;
+                    }
+
+                    char operator_btw_matrices = ' ';
+                    //Проверка оператора
+                    if (i>0)
+                    {
+                        if (expr[i]== '+' || expr[i] == '*' || expr[i] == '-')
+                        {
+                            operator_btw_matrices = expr[i];
+                            i++;
+                            if (i<expr.Length)
+                            {
+                                string matrix_2 = "";
+                                while ( i<expr.Length && char.IsLetterOrDigit(expr[i]) )
+                                {
+                                    matrix_2 += expr[i];
+                                    i++;
+                                    
+                                }
+                                if (i==expr.Length)
+                                {
+                                    MessageBox.Show("Выражение корректно!");
+                                    if (File.Exists(path_to_FS + matrix_1 + ".txt"))
+                                    {
+                                          if (File.Exists(path_to_FS + matrix_2 + ".txt"))
+                                          {
+                                            int dim1;
+                                            double typ_elt1;
+                                            int orientation1;
+                                            using (var reader = new StreamReader(path_to_FS + matrix_1 + ".txt"))
+                                            {
+                                                dim1 = Convert.ToInt32(reader.ReadLine());
+                                                orientation1 = Convert.ToInt32(reader.ReadLine());
+                                                typ_elt1 = Convert.ToDouble(reader.ReadLine());
+                                                
+                                            }
+
+                                            int dim2;
+                                            double typ_elt2;
+                                            int orientation2;
+                                            using (var reader = new StreamReader(path_to_FS + matrix_2 + ".txt"))
+                                            {
+                                                dim2 = Convert.ToInt32(reader.ReadLine()); 
+                                                orientation2 = Convert.ToInt32(reader.ReadLine());
+                                                typ_elt2 = Convert.ToDouble(reader.ReadLine());
+                                            }
+                                            if (dim1 == dim2)
+                                            {
+                                                if (typ_elt1 == typ_elt2)
+                                                {
+                                                    if (orientation1 == orientation2)
+                                                    {
+                                                        choose_operation_of_M1_and_M2(operator_btw_matrices, matrix_1, matrix_2, dim1, orientation1, typ_elt1);
+                                                    }
+                                                    else
+                                                    {
+                                                        MessageBox.Show($"матрица {matrix_1} и матрица {matrix_2} имеют разные ориентации",
+                                                                         "ОШИБКА, у матриц разная ориентация");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    MessageBox.Show($"Значения однотипных эл-ов матрицы {matrix_1}({typ_elt1}) и матрицы {matrix_2}({typ_elt2}) не совпадают",
+                                                                    "ОШИБКА, у матриц разные значения однотипного элемента");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                MessageBox.Show($"Размерности матрицы {matrix_1}({dim1}) и матрицы {matrix_2}({dim2}) не совпадают",
+                                                                 "ОШИБКА, у матриц разная размерность");
+                                            }
+
+                                          }
+                                          else
+                                          {
+                                              MessageBox.Show($"Матрицы с именем \"{matrix_2}\" не существует", "Не удалось найти матрицу");
+                                          }
+                                    }
+                                    else
+                                    {
+                                      MessageBox.Show($"Матрицы с именем \"{matrix_1}\" не существует","Не удалось найти матрицу");
+                                    }
+                                     
+                                   
+                                    
+                                        //1 проверить обе матрицы сущ-ют у них одинакова размерность и ориентация и однотип эл-нт
+                                   //TODO: //все хорошо
+                                }
+                                else
+                                {
+                                    MessageBox.Show("В имени второй матрицы обнаружены неизвестные символы!", "ОШИБКА В ИМЕНИ ВТОРОЙ МАТРИЦЫ");
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Вторая матрица не указана!", "ОШИБКА ПРИ НАПИСАНИИ ВТОРОЙ МАТРИЦЫ");
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("НЕОПОЗНАННЫЙ ОПЕРАТОР,ожидался оператор +,-,*", "ОШИБКА ПРИ НАПИСАНИИ ОПЕРАТОРА");
+                            return;
+                        }
+                    }
+                    else//букв не встретилось
+                    {
+                        MessageBox.Show("Использованы запрещены символы, ожидалось имя матрицы!","ОШИБКА ПРИ НАПИСАНИИ ИМЕНИ МАТРИЦЫ");
+                        return;
+                    }
+            }
+
+        }
+
+      
     }
 }
-                         
+

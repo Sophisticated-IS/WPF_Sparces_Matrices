@@ -153,9 +153,9 @@
                         <Grid Grid.Row="0">
                             <DockPanel Margin="5" LastChildFill="True">
                                 <TextBlock Text="Выражение" FontSize="16" FontWeight="ExtraBlack" Foreground="Black" DockPanel.Dock="Top"/>
-                                <Button BorderBrush="Black" BorderThickness="3" Content="=" FontSize="30" FontWeight="UltraBold" Foreground="#FFFFBE40" FontFamily="Arial" Background="#FF2A4580" DockPanel.Dock="Right"/>
+                                <Button BorderBrush="Black" BorderThickness="3" Content="=" FontSize="30" FontWeight="UltraBold" Foreground="#FFFFBE40" FontFamily="Arial" Background="#FF2A4580" DockPanel.Dock="Right" Click="Button_Click_Expression"/>
                                 <Border BorderBrush="#FFFFBE40" BorderThickness="8">
-                                    <TextBox  Padding="10" FontSize="20" FontWeight="UltraBlack" TextAlignment="Center" Text="A+B+G*E^-1"
+                                    <TextBox Name="txtBox_Expression"  Padding="10" FontSize="20" FontWeight="UltraBlack" TextAlignment="Center" Text="A+B+G*E^-1"
                                                   Background="White" BorderBrush="#FF110B0B"  CaretBrush="#FF050359" SelectionBrush="#FF2A85AE" Foreground="Black"/>
                                 </Border>
                             </DockPanel>
@@ -169,7 +169,7 @@
                                     <TabItem  Header="Выбор матрицы" >
                                         <Border  BorderThickness="3" BorderBrush="#FFFFBE40" Background="#FFFFBE40">
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                                                <ComboBox x:Name="ComboBox_orientation" Style="{StaticResource combobox_style}"  MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
+                                                <ComboBox x:Name="ComboBox_orientation" Style="{StaticResource combobox_style}"  MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Black" FontSize="16" SelectionChanged="ComboBox_orientation_SelectionChanged" controls:TextBoxHelper.Watermark="sdfsdfsd">
                                                     <ComboBoxItem Content="Ориентация" FontStyle="Italic" Visibility="Collapsed"/>
                                                     <ComboBoxItem>
                                                         <Image Source="Images\Orientations(minsize) for comboBox\ОР.png"/>
@@ -185,13 +185,11 @@
                                                     </ComboBoxItem>
                                                 </ComboBox>
 
-                                                <ComboBox x:Name="ComboBox_common_elts" Style="{StaticResource combobox_style}" MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
-                                                    <ComboBoxItem Content="Значение однотипных элементов" FontStyle="Italic" Visibility="Collapsed"/>
-
-
+                                                <ComboBox x:Name="ComboBox_common_elts" Style="{StaticResource combobox_style}" MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Black" FontSize="16" SelectionChanged="ComboBox_common_elts_SelectionChanged">
+                                                    <ComboBoxItem Content="Значение однотипных элементов" Foreground="Gray" FontStyle="Italic" Visibility="Collapsed"/>
                                                 </ComboBox>
 
-                                                <ComboBox x:Name="comboBox_name" Style="{StaticResource combobox_style}" MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Gray" FontSize="16">
+                                                <ComboBox x:Name="comboBox_name" Style="{StaticResource combobox_style}" MinHeight="50" MinWidth="100" Background="AliceBlue" Margin="5" Foreground="Black" FontSize="16" SelectionChanged="comboBox_name_SelectionChanged">
                                                     <ComboBoxItem Content="Название" FontStyle="Italic" Visibility="Collapsed"/>
 
                                                 </ComboBox>
@@ -245,7 +243,7 @@
 
                             <Grid Grid.Column="1">
 
-                                <TextBlock   HorizontalAlignment="Center" VerticalAlignment="Center"  FontSize="28" FontWeight="DemiBold" ><Run Text="Матрица &quot;Matrix1&quot;"/></TextBlock>
+                                <TextBlock Name="Matrix_name_1st_page"   HorizontalAlignment="Center" VerticalAlignment="Center"  FontSize="28" FontWeight="DemiBold" ><Run Text="Здесь отобразится результат вычислений"/></TextBlock>
                             </Grid>
                             <Grid Grid.Column="2" HorizontalAlignment="Right">
 
@@ -371,7 +369,7 @@
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
                                 <Grid Grid.Row="0">
-                                    <TextBox Name="text_box_search" controls:TextBoxHelper.Watermark="🔎 Поиск матрицы" FontSize="16" SelectionBrush="#FF4573D5" TextChanged="TextBox_TextChanged"/>
+                                    <TextBox Name="text_box_search" TextWrapping="NoWrap" controls:TextBoxHelper.Watermark="🔎 Поиск матрицы" FontSize="16" SelectionBrush="#FF4573D5" TextChanged="TextBox_TextChanged"/>
 
                                 </Grid>
                                 <Grid Grid.Row="1">
