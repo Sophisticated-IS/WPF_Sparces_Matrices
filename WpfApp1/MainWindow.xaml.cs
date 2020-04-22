@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace Wpf_Matrices
 {
-
+    //Классно всё делать одному,поэтому за код не бейте сильно,т.к. почти никакие принципы хорошего тона программирования не соблюдены
     public partial class MainWindow
     {
-        const string path_to_FS = @"C:\Users\Sova IS\Desktop\WPF_triangular_matrix_root\Матрицы\";//путь в корне программы до папки с матрицами
+        string path_to_FS = "";//путь в корне программы до папки с матрицами
         readonly ImageSource[] orientations = new ImageSource[4];//массив на 4 пути к картинкам с ориентацией треуг матрицы
         int index_image = 0;//индекс текущей картинки в массиве orientations
 
@@ -20,22 +24,31 @@ namespace Wpf_Matrices
         List<string> list_matrices_typic_elt = new List<string>();//заменил double на string из-за ненужного округления
         int orientation_number = 1;
         int dimension = 50;
+        string[,] Datagrid1stpage_result_matrix = new string[0, 0];//массив для работы с первым datagrid
         string[,] array_inp = new string[50, 50];//массив для работы со вторым datagrid
         double typical_elt = 0;//значение однотип элемента
         string[,] array_dense = new string[0, 0];
         bool cancel_handle_norm_form = false;//проверяет отменил ли пользователь переход из dense form в normal form
+
+        //<Нужны для того чтобы отображать и сохранять результат вычислений матриц>
+        int last_orientation = -1;
+        double last_typical_elt = -1;
+        char last_operation = ' ';
+        int last_dimension = -1;
+        //<Нужны для того чтобы отображать и сохранять результат вычислений матриц>
         public MainWindow()
         {
             InitializeComponent();
-            ImageSourceConverter cvrt = new ImageSourceConverter();
-            orientations[0] = (ImageSource)cvrt.ConvertFromString(@"C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\Images\Orientations for button\ОР.png");
-            orientations[1] = (ImageSource)cvrt.ConvertFromString(@"C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\Images\Orientations for button\OP2.png");
-            orientations[2] = (ImageSource)cvrt.ConvertFromString(@"C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\Images\Orientations for button\OP3.png");
-            orientations[3] = (ImageSource)cvrt.ConvertFromString(@"C:\Users\Sova IS\source\repos\WpfApp1\WpfApp1\Images\Orientations for button\OP4.png");
+            DG_Expressions.ItemsSource = history_exprs;//привязка списка выражений хранящихся в гриде 
+            orientations[0] = Imaging.CreateBitmapSourceFromHBitmap(WpfApp1.Properties.Resources.OP2.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            orientations[1] = Imaging.CreateBitmapSourceFromHBitmap(WpfApp1.Properties.Resources.ОР.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            orientations[2] = Imaging.CreateBitmapSourceFromHBitmap(WpfApp1.Properties.Resources.OP4.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            orientations[3] = Imaging.CreateBitmapSourceFromHBitmap(WpfApp1.Properties.Resources.OP3.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            Image_OR.Source = orientations[0];
 
             fill_array_depend_on_orient(array_inp, 50, 1, typical_elt);
             dataGrid2D_sec_page.ItemsSource2D = array_inp;
-            double[,] default_datagrid_result = new double[20, 100];
+            double[,] default_datagrid_result = new double[25, 25];
             dataGrid2D.ItemsSource2D = default_datagrid_result;
 
             ComboBox_orientation.SelectedIndex = 0;
@@ -178,6 +191,11 @@ namespace Wpf_Matrices
                     {
                         double tmp = Convert.ToDouble(array[i, j]);
                     }
+                    catch (OverflowException)
+                    {
+                        MessageBox.Show($"Ошибка {add_message}! Элемент в строке {i} и стобце {j} выходит за границы double!", "Ошибка при вводе элементов");
+                        return false;
+                    }
                     catch (FormatException)
                     {
                         MessageBox.Show($"Ошибка {add_message}! Элемент в строке {i} и стобце {j} не является действительным числом!", "Ошибка при вводе элементов");
@@ -191,18 +209,9 @@ namespace Wpf_Matrices
         {
             if (!(comboBox.Items.Count == 0))
             {
-                if (comboBox.SelectedItem.ToString() == "System.Windows.Controls.ComboBoxItem: Значение однотипных элементов"
-                    || comboBox.SelectedItem.ToString() == "System.Windows.Controls.ComboBoxItem: Название")
-                {
-                    //это знач по умолчанию не удаляем  их
-                }
-                else
-                {
-                    comboBox.Items.Clear();
-                }
+                        comboBox.Items.Clear();
             }
-            else; //он пуст
-
+            else;//ничего не делаем
         }
         public void read_matrix_from_file(StreamReader file)//читает из файла элементы в упакованной форме в ГЛОБАЛЬНЫЙ массив array_dense ТОЛЬКО ДЛЯ сокращения кода
         {
@@ -267,7 +276,7 @@ namespace Wpf_Matrices
                 i++;
             }
         }
-        public List<double> get_elts_in_list_from_file(string matrix_name,int orient,int dim)//заполняет в список элементы из файла 
+        public List<double> get_elts_in_list_from_file(string matrix_name, int orient, int dim)//заполняет в список элементы из файла 
         {
             using (var reader = new StreamReader(path_to_FS + matrix_name + ".txt"))
             {
@@ -276,7 +285,7 @@ namespace Wpf_Matrices
                 reader.ReadLine();
                 reader.ReadLine();
 
-                
+
                 List<double> list_from_file = new List<double>();
                 if (dim == 1)
                 {
@@ -287,10 +296,10 @@ namespace Wpf_Matrices
                 else
                 {
 
-             
+
                     string line;
                     int i = 0;
-                    while ((line = reader.ReadLine())!= null)
+                    while ((line = reader.ReadLine()) != null)
                     {
                         string[] str_elts = line.Split(' ');
                         int j = 0;
@@ -340,18 +349,18 @@ namespace Wpf_Matrices
                         }
                         i++;
                     }
-                return list_from_file;
+                    return list_from_file;
                 }
             }
         }
-        public void show_result_matrix(List<double> list_result,int dim,int orient,double value_typ_elt,bool result_is_full_matrix)//отвечает за отображение матрицы в гриде на первой странице
+        public void show_result_matrix(List<double> list_result, int dim, int orient, double value_typ_elt, bool result_is_full_matrix)//отвечает за отображение матрицы в гриде на первой странице
         {
             Matrix_name_1st_page.Text = "МАТРИЦА - РЕЗУЛЬТАТ";
-            string[,] result_matrix = new string[dim, dim];
+            Datagrid1stpage_result_matrix = new string[dim, dim];
 
             if (dim == 1)
             {
-                result_matrix[0, 0] = list_result.ElementAt(0).ToString();
+                Datagrid1stpage_result_matrix[0, 0] = list_result.ElementAt(0).ToString();
             }
             else
             {
@@ -363,7 +372,7 @@ namespace Wpf_Matrices
                     {
                         for (int j = 0; j < dim; j++)
                         {
-                            result_matrix[i,j] = list_result.ElementAt(counter).ToString();
+                            Datagrid1stpage_result_matrix[i, j] = list_result.ElementAt(counter).ToString();
                             counter++;
                         }
                     }
@@ -380,12 +389,12 @@ namespace Wpf_Matrices
 
                                     if (i + j <= dim - 1)
                                     {
-                                        result_matrix[i, j] = list_result.ElementAt(counter).ToString();
+                                        Datagrid1stpage_result_matrix[i, j] = list_result.ElementAt(counter).ToString();
                                         counter++;
                                     }
                                     else
                                     {
-                                        result_matrix[i, j] = str_typ_elt;
+                                        Datagrid1stpage_result_matrix[i, j] = str_typ_elt;
                                     }
 
                                     break;
@@ -394,12 +403,12 @@ namespace Wpf_Matrices
 
                                     if (i + j >= dim - 1)
                                     {
-                                        result_matrix[i, j] = list_result.ElementAt(counter).ToString();
+                                        Datagrid1stpage_result_matrix[i, j] = list_result.ElementAt(counter).ToString();
                                         counter++;
                                     }
                                     else
                                     {
-                                        result_matrix[i, j] = str_typ_elt;
+                                        Datagrid1stpage_result_matrix[i, j] = str_typ_elt;
                                     }
 
                                     break;
@@ -408,12 +417,12 @@ namespace Wpf_Matrices
 
                                     if (i <= j)
                                     {
-                                        result_matrix[i, j] = list_result.ElementAt(counter).ToString();
+                                        Datagrid1stpage_result_matrix[i, j] = list_result.ElementAt(counter).ToString();
                                         counter++;
                                     }
                                     else
                                     {
-                                        result_matrix[i, j] = str_typ_elt;
+                                        Datagrid1stpage_result_matrix[i, j] = str_typ_elt;
                                     }
 
                                     break;
@@ -422,12 +431,12 @@ namespace Wpf_Matrices
 
                                     if (i >= j)
                                     {
-                                        result_matrix[i, j] = list_result.ElementAt(counter).ToString();
+                                        Datagrid1stpage_result_matrix[i, j] = list_result.ElementAt(counter).ToString();
                                         counter++;
                                     }
                                     else
                                     {
-                                        result_matrix[i, j] = str_typ_elt;
+                                        Datagrid1stpage_result_matrix[i, j] = str_typ_elt;
                                     }
                                     break;
 
@@ -436,13 +445,55 @@ namespace Wpf_Matrices
                         }
                     }
                 }
-                
-               
+
+
             }
-            dataGrid2D.ItemsSource2D = result_matrix;
-          
+            dataGrid2D.ItemsSource2D = Datagrid1stpage_result_matrix;
         }
-        public void choose_operation_of_M1_and_M2 (char operation,string matrix_name1, string matrix_name2,int dim,int orient,double val_typ_elt)//производит выбор функции в зависимости от перации
+        //Math .NET Numerics!!!!!!!
+        public void fill_2D_array_from_file_and_show(string matrix_name,int dim)//заполняет массив и находит обратную матрицу
+        {
+            double[,] array_inv = new double[dim,dim];
+
+            using (var reader = new StreamReader(path_to_FS + matrix_name + ".txt"))
+            {
+                //пропуск размерности ориентации и однотип элемента
+                reader.ReadLine();
+                reader.ReadLine();
+                reader.ReadLine();
+
+                string line;
+                int i = 0;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] str_elts = line.Split(' ');
+                    int j = 0;
+                    foreach (var item in str_elts)
+                    {
+                        array_inv[i,j] =Convert.ToDouble(item);
+                        j++;
+                    }
+                    i++;
+                }
+            }
+
+            var matrix = Matrix<double>.Build.DenseOfArray(array_inv);
+            if ((int)matrix.Determinant() == 0 )
+            {
+                MessageBox.Show("Определитель матрицы равен нулю","НЕВОЗМОЖНО НАЙТИ ОБРАТНУЮ МАТРИЦУ");
+            }
+            else
+            {
+                array_inv = matrix.Inverse().ToArray();
+                dataGrid2D.ItemsSource2D =array_inv;
+                add_exp_to_history();
+            }
+            
+            
+
+        }
+        //Math .NET Numerics!!!!!!!
+        public void choose_operation_of_M1_and_M2(char operation, string matrix_name1, string matrix_name2, int dim, int orient, double val_typ_elt)//производит выбор функции в зависимости от перации
         {
             Sparse_Matrix sparse_m = new Sparse_Matrix();
             switch (operation)
@@ -451,18 +502,18 @@ namespace Wpf_Matrices
                     double chnged_val_typ_elt = val_typ_elt;
                     if (val_typ_elt != 0)
                     {
-                        chnged_val_typ_elt = val_typ_elt*2;
+                        chnged_val_typ_elt = val_typ_elt * 2;
                     }
                     else;//нам не надо его удваивать
-                    show_result_matrix(sparse_m.triangular_matrix_sum(get_elts_in_list_from_file(matrix_name1,orient,dim), get_elts_in_list_from_file(matrix_name2,orient,dim)),
-                                       dim, orient, chnged_val_typ_elt,false);
-                break;
-                    
+                    show_result_matrix(sparse_m.triangular_matrix_sum(get_elts_in_list_from_file(matrix_name1, orient, dim), get_elts_in_list_from_file(matrix_name2, orient, dim)),
+                                       dim, orient, chnged_val_typ_elt, false);
+                    break;
+
                 case '-':
                     val_typ_elt = 0;//при вычитании однотипный элемент будет получаться всегда 0 в результате
-                   show_result_matrix( sparse_m.triangular_matrix_sub(get_elts_in_list_from_file(matrix_name1,orient,dim), get_elts_in_list_from_file(matrix_name2,orient,dim)),
-                                       dim,orient,val_typ_elt,false);
-                break;
+                    show_result_matrix(sparse_m.triangular_matrix_sub(get_elts_in_list_from_file(matrix_name1, orient, dim), get_elts_in_list_from_file(matrix_name2, orient, dim)),
+                                        dim, orient, val_typ_elt, false);
+                    break;
 
                 case '*':
                     switch (val_typ_elt)
@@ -471,33 +522,33 @@ namespace Wpf_Matrices
                             switch (orient)
                             {
                                 case 1:
-                                    show_result_matrix(sparse_m.upper_triangular_matrix_secondary_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim), 
+                                    show_result_matrix(sparse_m.upper_triangular_matrix_secondary_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim),
                                                           get_elts_in_list_from_file(matrix_name2, orient, dim), dim),
                                        dim, orient, val_typ_elt, true);
                                     break;
-                                    
+
                                 case 2:
-                                    show_result_matrix(sparse_m.lower_triangular_matrix_secondary_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim), 
+                                    show_result_matrix(sparse_m.lower_triangular_matrix_secondary_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim),
                                                           get_elts_in_list_from_file(matrix_name2, orient, dim), dim),
                                        dim, orient, val_typ_elt, true);
                                     break;
-                                    
+
                                 case 3:
-                                    show_result_matrix(sparse_m.upper_triangular_matrix_major_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim), 
+                                    show_result_matrix(sparse_m.upper_triangular_matrix_major_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim),
                                                        get_elts_in_list_from_file(matrix_name2, orient, dim), dim),
-                                        dim, orient, val_typ_elt,false);
+                                        dim, orient, val_typ_elt, false);
                                     break;
-                                    
+
                                 case 4:
-                                    show_result_matrix(sparse_m.lower_triangular_matrix_major_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim), 
+                                    show_result_matrix(sparse_m.lower_triangular_matrix_major_diagonal_with_nulls(get_elts_in_list_from_file(matrix_name1, orient, dim),
                                                       get_elts_in_list_from_file(matrix_name2, orient, dim), dim),
-                                     dim, orient, val_typ_elt,false);
+                                     dim, orient, val_typ_elt, false);
                                     break;
-                                default:throw new Exception("Ориентацию при попытке умножения не удалось распознать!");
+                                default: throw new Exception("Ориентацию при попытке умножения не удалось распознать!");
                             }
                             break;
 
-                        
+
                         default:
                             switch (orient)
                             {
@@ -521,17 +572,53 @@ namespace Wpf_Matrices
                                                        get_elts_in_list_from_file(matrix_name2, orient, dim), dim, val_typ_elt, "low_secondary"),
                                     dim, orient, val_typ_elt, true);
                                     break;
-                                
+
                                 default:
                                     break; throw new Exception("Ориентация при попытке умножения не распознана!");
                             }
                             break;
                     }
                     break;
+                case '~':
+                    fill_2D_array_from_file_and_show(matrix_name1, dim);
+                    break;
 
                 default:
                     throw new Exception("Операция была не распознана");
             }
+        }
+
+        List<DG_history> history_exprs = new List<DG_history>();//список выражений
+        public void add_exp_to_history()
+        {
+            if (history_exprs.Count == 10)
+            {
+                List<DG_history> stack_list = new List<DG_history>
+                {
+                    new DG_history { Number = 1, Expression = txtBox_Expression.Text }
+                };//в списке будет удалено послед выражение и добавлено новое в начало и изменена нумерация
+                history_exprs.RemoveAt(9);
+                stack_list.AddRange(history_exprs);
+                history_exprs.Clear();
+
+                int counter = 1;
+                foreach (var item in stack_list)//после того как соединили поправим нумерацию
+                {
+                    item.Number = counter;
+                    counter++;
+                }
+
+                history_exprs.AddRange(stack_list);
+
+
+            }
+            else//если не набралось 10 выражений то просто добавим новое 
+            {
+
+                history_exprs.Add(new DG_history { Number = history_exprs.Count + 1, Expression = txtBox_Expression.Text });
+
+            }
+            DG_Expressions.Items.Refresh();
         }
         //Логически важные методы (Лучше вынести в класс потом )
         private void save_matrix_in_file(string File_path, string message)
@@ -637,11 +724,74 @@ namespace Wpf_Matrices
                 }
         }
 
-        private void Save_Matrix_Dialog(object sender, System.Windows.RoutedEventArgs e)
+        private void Save_Matrix_Dialog(object sender, RoutedEventArgs e)
         {
 
             WpfApp1.Window_save_result_matrix window_Save_Result = new WpfApp1.Window_save_result_matrix();
             window_Save_Result.ShowDialog();
+
+            if (window_Save_Result.isSelectedSaveButton)
+            {
+                if (last_operation == '+')
+                {
+                    last_typical_elt *= 2;
+                }
+                if (last_operation == '-')
+                {
+                    last_typical_elt = 0;
+                }
+
+                using (var file = File.CreateText(window_Save_Result.get_Path))
+                {
+                    file.WriteLine(last_dimension);
+                    file.WriteLine(last_orientation);
+                    file.WriteLine(last_typical_elt);
+
+                    for (int i = 0; i < last_dimension; i++)
+                    {
+                        string buffer = "";
+                        for (int j = 0; j < last_dimension; j++)
+                        {
+                            buffer += Datagrid1stpage_result_matrix[i, j] + " ";
+                        }
+                        file.WriteLine(buffer.TrimEnd(' '));
+                    }
+                }
+
+                    //сохранить матрицу по пути пользователя
+                    if (window_Save_Result.isSelectedAddToMatrixList && (last_operation == '+' || last_operation == '-'
+                        || (last_operation == '*' && (last_orientation == 3 || last_orientation == 4))))//если матрица треугольная и выбрана опция добавить в список
+                    {
+                        if (list_matrices.Find(delegate (string str) { return str == window_Save_Result.get_Matrix_name; }) == null)
+                        {
+                            try
+                            {
+                                //скопировать матрицу в корень проги
+                                File.Copy(window_Save_Result.get_Path, path_to_FS + window_Save_Result.get_Matrix_name + ".txt");
+                                //добавить в список
+                                list_matrices.Add(window_Save_Result.get_Matrix_name);
+                                list_matrices_orient.Add(last_orientation);
+                                list_matrices_typic_elt.Add(last_typical_elt.ToString());
+                                List_Matrices.Items.Refresh();
+                            }
+                            catch ( Exception ex)
+                            {
+                                MessageBox.Show($"Не удалось добавить матрицу-результат в список {ex.Message}") ;
+                            }
+                            
+                        }
+                        else
+                        {
+                            MessageBox.Show("Не удалось добавить матрицу в список, так как матрица с таким именем уже существует!");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не удалось добавить матрицу в список, так как результат является полноразмерной матрицей!", "МАТРИЦА НЕ ЯВЛЯЕТСЯ ТРЕУГОЛЬНОЙ");
+                    }
+                
+            }
+            else;//пользователь отменил сохр-ие
         }
 
         private void Button_Orientation_Click(object sender, RoutedEventArgs e)
@@ -774,7 +924,7 @@ namespace Wpf_Matrices
                                 {
                                     //TODO: ДОБАВИТЬ ПРОВЕРКУ НА ОРИЕНТАЦИя но ОНА будет много жрать ЦП так как проверить нужно все элементы 
                                     //все в порядке то добавим в список и надо ли считывать?
-                                    MessageBox.Show("Матрица в файле валидна");
+                                    //MessageBox.Show("Матрица в файле валидна");
                                     //cancel_handle_norm_form = true;
                                     TabItem_Dense_Form.IsSelected = true;
 
@@ -857,8 +1007,9 @@ namespace Wpf_Matrices
                 }
         }
 
-        private void Button_Click_Create_Matrix(object sender, RoutedEventArgs e)
+        private async void Button_Click_Create_Matrix(object sender, RoutedEventArgs e)
         {
+
             validate_numericup_down();
             validate_txt_box_only_double();//если кто-то кнопку нажмет через TAB
             MessageBoxResult messageBoxResult = new MessageBoxResult();
@@ -901,7 +1052,7 @@ namespace Wpf_Matrices
                 }
                 catch (OutOfMemoryException)
                 {
-                    throw new OutOfMemoryException();
+                    MessageBox.Show("Вам не хватает памяти для матрицы такой размерности", "НЕВОЗМОЖНО СОЗДАТЬ МАТРИЦУ");
                 }
                 catch (FormatException)
                 {
@@ -944,7 +1095,9 @@ namespace Wpf_Matrices
                                 orientation_number = tmp_number_orientation;//то же самое с ориентацией
                                 typical_elt = tmp_typical_elt;//и с элементом однотипным
                                 array_dense = new string[amount_of_not_null_elts(dimension), 1];
+                                
                                 dataGrid2D_sec_page.ItemsSource2D = array_dense;
+                                
                                 Label_Matrix_Name.Text = "НЕСОХРАНЕННАЯ МАТРИЦА";
                                 MessageBox.Show("Матрица в упакованной форме создана успешно!");
                             }
@@ -1383,10 +1536,10 @@ namespace Wpf_Matrices
 
         }
 
-        private void TabItem_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void TabItem_PreviewMouseDown_Addresses(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            e.Handled = true;
-            throw new NotImplementedException();
+          //  e.Handled = true;//TODO:реализация адресов
+
         }
         bool first_call_miss = false;//пропустить первый раз при загрузке
         private void ComboBox_orientation_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1430,10 +1583,14 @@ namespace Wpf_Matrices
             {
                 if (ComboBox_common_elts.Items.Count != 0)
                 {
-                    remove_all_elts_combobox(comboBox_name); //очистка чтобы имена старые удалялись 
-
-                    List<string> typ_elts_value = new List<string>();//хранятся  значения однотипных элементов
-                    List<int> indexes_of_elts_in_full_list = new List<int>();//индексы для списка выше
+                    //remove_all_elts_combobox(comboBox_name); //очистка чтобы имена старые удалялись 
+                    if (!(comboBox_name.Items.Count == 0))
+                    {
+                        comboBox_name.Items.Clear();
+                    }
+                    else;//empty
+                        List<string> typ_elts_value = new List<string>();//хранятся  значения однотипных элементов
+                    List<int> indexes_of_elts_in_full_list = new List<int>();//индексы для списка 
                     int index = 0;//проходимся по всем элементам списка list_matrices_orient
                     foreach (var item in list_matrices_orient)
                     {
@@ -1458,6 +1615,8 @@ namespace Wpf_Matrices
                         else;
                         count++;
                     }
+
+
                 }
                 else
                 {
@@ -1483,7 +1642,7 @@ namespace Wpf_Matrices
                 using (var file = new StreamReader(path_to_FS + comboBox_name.SelectedItem.ToString() + ".txt"))
                 {
                     //Пропуск инф-ции о матрице
-                    int dim =Convert.ToInt32(file.ReadLine());
+                    int dim = Convert.ToInt32(file.ReadLine());
                     file.ReadLine();
                     file.ReadLine();
                     string[,] array_in_normal_form = new string[dim, dim];
@@ -1507,37 +1666,62 @@ namespace Wpf_Matrices
             else;//значит нечего выводить
         }
 
-        private void Button_Click_Expression(object sender, RoutedEventArgs e)
+        private void Button_Click_Compute_Expression(object sender, RoutedEventArgs e)
         {
             string expr = txtBox_Expression.Text.Trim();
             if (!string.IsNullOrEmpty(expr))
-            if (expr[0]=='~')
-            {
+                if (expr[0] == '~')
+                {
                     int i = 1;
-                    string matrix_rev = "";
-                    while (i< expr.Length &&  char.IsLetterOrDigit(expr[i]) )
+                    string matrix_inv = "";
+                    while (i < expr.Length && char.IsLetterOrDigit(expr[i]))
                     {
-                        matrix_rev += expr[i];    
+                        matrix_inv += expr[i];
                         i++;
                     }
 
                     if (expr.Length == i)
                     {
-                        //TODO:     //все хорошо
-                        throw new NotImplementedException("Сережа ответственен?");
+                        if (File.Exists(path_to_FS + matrix_inv + ".txt"))
+                        {
+                            try
+                            {
+                                int dim;
+                                double typ_elt;
+                                int orientation;
+                                using (var reader = new StreamReader(path_to_FS + matrix_inv + ".txt"))
+                                {
+                                    dim = Convert.ToInt32(reader.ReadLine());
+                                    orientation = Convert.ToInt32(reader.ReadLine());
+                                    typ_elt = Convert.ToDouble(reader.ReadLine());
+                                }
+                                choose_operation_of_M1_and_M2('~', matrix_inv, "", dim, orientation, typ_elt);
+                              
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Ошибка:{ex.Message}","НЕ УДАЛОСЬ НАЙТИ ОБРАТНУЮ МАТРИЦУ");
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Матрицы с именем \"{matrix_inv}\" не существует", "Не удалось найти матрицу");
+                        }
+
+                           
                     }
                     else
                     {
                         MessageBox.Show("После имени матрицы содержатся лишние символы!", "ОШИБКА ПРИ НАХОЖДЕНИИ ОБРАТНОЙ МАТРИЦЫ");
                     }
-            }
-            else
-            {
+                }
+                else
+                {
                     int i = 0;
                     string matrix_1 = "";//первая матрица
                     while (char.IsLetterOrDigit(expr[i]))
                     {
-                        if (i<expr.Length)
+                        if (i < expr.Length - 1)
                         {
 
                         }
@@ -1549,31 +1733,29 @@ namespace Wpf_Matrices
                         matrix_1 += expr[i];
                         i++;
                     }
-
-                    char operator_btw_matrices = ' ';
                     //Проверка оператора
-                    if (i>0)
+                    if (i > 0)
                     {
-                        if (expr[i]== '+' || expr[i] == '*' || expr[i] == '-')
+                        if (expr[i] == '+' || expr[i] == '*' || expr[i] == '-')
                         {
-                            operator_btw_matrices = expr[i];
+                            char operator_btw_matrices = expr[i];
                             i++;
-                            if (i<expr.Length)
+                            if (i < expr.Length)
                             {
                                 string matrix_2 = "";
-                                while ( i<expr.Length && char.IsLetterOrDigit(expr[i]) )
+                                while (i < expr.Length && char.IsLetterOrDigit(expr[i]))
                                 {
                                     matrix_2 += expr[i];
                                     i++;
-                                    
+
                                 }
-                                if (i==expr.Length)
+                                if (i == expr.Length)
                                 {
-                                    MessageBox.Show("Выражение корректно!");
+                                    //MessageBox.Show("Выражение корректно!");
                                     if (File.Exists(path_to_FS + matrix_1 + ".txt"))
                                     {
-                                          if (File.Exists(path_to_FS + matrix_2 + ".txt"))
-                                          {
+                                        if (File.Exists(path_to_FS + matrix_2 + ".txt"))
+                                        {
                                             int dim1;
                                             double typ_elt1;
                                             int orientation1;
@@ -1582,7 +1764,7 @@ namespace Wpf_Matrices
                                                 dim1 = Convert.ToInt32(reader.ReadLine());
                                                 orientation1 = Convert.ToInt32(reader.ReadLine());
                                                 typ_elt1 = Convert.ToDouble(reader.ReadLine());
-                                                
+
                                             }
 
                                             int dim2;
@@ -1590,7 +1772,7 @@ namespace Wpf_Matrices
                                             int orientation2;
                                             using (var reader = new StreamReader(path_to_FS + matrix_2 + ".txt"))
                                             {
-                                                dim2 = Convert.ToInt32(reader.ReadLine()); 
+                                                dim2 = Convert.ToInt32(reader.ReadLine());
                                                 orientation2 = Convert.ToInt32(reader.ReadLine());
                                                 typ_elt2 = Convert.ToDouble(reader.ReadLine());
                                             }
@@ -1601,6 +1783,13 @@ namespace Wpf_Matrices
                                                     if (orientation1 == orientation2)
                                                     {
                                                         choose_operation_of_M1_and_M2(operator_btw_matrices, matrix_1, matrix_2, dim1, orientation1, typ_elt1);
+                                                        add_exp_to_history();
+                                                        //Нужно чтобы проверить можно ли добавить результат в список
+                                                        last_dimension = dim1;
+                                                        last_operation = operator_btw_matrices;
+                                                        last_orientation = orientation1;
+                                                        last_typical_elt = typ_elt1;
+                                                        //Нужно чтобы проверить можно ли добавить результат в список
                                                     }
                                                     else
                                                     {
@@ -1620,21 +1809,21 @@ namespace Wpf_Matrices
                                                                  "ОШИБКА, у матриц разная размерность");
                                             }
 
-                                          }
-                                          else
-                                          {
-                                              MessageBox.Show($"Матрицы с именем \"{matrix_2}\" не существует", "Не удалось найти матрицу");
-                                          }
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show($"Матрицы с именем \"{matrix_2}\" не существует", "Не удалось найти матрицу");
+                                        }
                                     }
                                     else
                                     {
-                                      MessageBox.Show($"Матрицы с именем \"{matrix_1}\" не существует","Не удалось найти матрицу");
+                                        MessageBox.Show($"Матрицы с именем \"{matrix_1}\" не существует", "Не удалось найти матрицу");
                                     }
-                                     
-                                   
-                                    
-                                        //1 проверить обе матрицы сущ-ют у них одинакова размерность и ориентация и однотип эл-нт
-                                   //TODO: //все хорошо
+
+
+
+                                    //1 проверить обе матрицы сущ-ют у них одинакова размерность и ориентация и однотип эл-нт
+                                    //TODO: //все хорошо
                                 }
                                 else
                                 {
@@ -1654,14 +1843,92 @@ namespace Wpf_Matrices
                     }
                     else//букв не встретилось
                     {
-                        MessageBox.Show("Использованы запрещены символы, ожидалось имя матрицы!","ОШИБКА ПРИ НАПИСАНИИ ИМЕНИ МАТРИЦЫ");
+                        MessageBox.Show("Использованы запрещены символы, ожидалось имя матрицы!", "ОШИБКА ПРИ НАПИСАНИИ ИМЕНИ МАТРИЦЫ");
                         return;
                     }
-            }
+                }
 
         }
 
-      
+        private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            //TODO : ОЧЕНЬ СТРАННОЕ ПОВЕДЕНИЕ КОДА
+            //ПРИ ДЕБАГЕ ДИРЕКТОРИЯ УДАЛЯЕТСЯ НО ПРИ ЗАПУСКЕ В РЕЛИЗЕ КОД НЕ УДАЛЯЕТ УЖЕ СУЩЕСТВУЮЩУЮ ДИРЕКТОРИЮ 
+            //это хренова мистика 
+            //Ошибка возникает только в студии
+            try
+            {
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            if (Directory.Exists($@"{Directory.GetCurrentDirectory()}\Матрицы"))
+            {
+                Directory.Delete($@"{Directory.GetCurrentDirectory()}\Матрицы", true);
+            }
+            else;//если нет то просто создадим её
+
+            path_to_FS = Directory.CreateDirectory($@"{Directory.GetCurrentDirectory()}\Матрицы").FullName + "\\";
+        }
+
+        private void MetroWindow_Closed(object sender, EventArgs e)
+        {
+
+            if (Directory.Exists($@"{Directory.GetCurrentDirectory()}\Матрицы"))
+            {
+                Directory.Delete($@"{Directory.GetCurrentDirectory()}\Матрицы", true);
+            }
+            else;// и так нету                 
+        }
+
+        private void Button_Click_plus(object sender, RoutedEventArgs e)
+        {
+            txtBox_Expression.Text += "+";
+        }
+
+        private void Button_Click_inverse(object sender, RoutedEventArgs e)
+        {
+            txtBox_Expression.Text += "~";
+        }
+
+        private void Button_Click_multiple(object sender, RoutedEventArgs e)
+        {
+            txtBox_Expression.Text += "*";
+        }
+
+        private void Button_Click_minus(object sender, RoutedEventArgs e)
+        {
+            txtBox_Expression.Text += "-";
+        }
+
+        private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (MessageBoxResult.Yes == MessageBox.Show("Вы уверены что хотите выйти, ВСЕ не сохраненные матрицы будут УДАЛЕНЫ", "Подтвердите выход", MessageBoxButton.YesNo))
+            {
+                //пользователь согласился
+            }
+            else
+            {
+                e.Cancel = true;
+            }
+        }
+
+        string[] keys_alowed = new string[] { "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "E", ".", "OemPlus"};
+        private void dataGrid2D_sec_page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+       
+            if (keys_alowed.Contains(e.Key.ToString()))
+            {
+
+            }
+            else
+            {
+                e.Handled = true;
+            }
+        }
     }
 }
 

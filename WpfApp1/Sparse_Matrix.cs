@@ -249,7 +249,7 @@ namespace Wpf_Matrices
             }
             return sum;
         }
-        public  List<double> lower_triangular_matrix_secondary_diagonal_with_nulls(List<double> A, List<double> B, int dimension)//САМЫЙ УЕБАНСКИЙ АЛГОРИТМ КОТОРЫЙ ВИДЕЛ СВЕТ
+        public  List<double> lower_triangular_matrix_secondary_diagonal_with_nulls(List<double> A, List<double> B, int dimension)//САМЫЙ ОТВРАТИТЕЛЬНЫЙ АЛГОРИТМ КОТОРЫЙ ВИДЕЛ СВЕТ
         {
             List<double> list_result = new List<double>();//TODO: Нужно ли сохрнять результат в отдельный список????? ПАМЯТЬ --
 
@@ -335,5 +335,6 @@ namespace Wpf_Matrices
             }
             return list_result;
         }
+
     }
 }
