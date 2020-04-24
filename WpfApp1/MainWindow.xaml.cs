@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +13,6 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace Wpf_Matrices
 {
-    //Классно всё делать одному,поэтому за код не бейте сильно,т.к. почти никакие принципы хорошего тона программирования не соблюдены
     public partial class MainWindow
     {
         string path_to_FS = "";//путь в корне программы до папки с матрицами
@@ -54,7 +54,6 @@ namespace Wpf_Matrices
             ComboBox_orientation.SelectedIndex = 0;
             comboBox_name.SelectedIndex = 0;
             ComboBox_common_elts.SelectedIndex = 0;
-
         }
         //Логически важные методы (Лучше вынести в класс потом )
         public void fill_array_depend_on_orient(string[,] array, int dim, int orientation_number, double typical_elt)//заполняет однотипные эл-ты в массиве
@@ -760,7 +759,7 @@ namespace Wpf_Matrices
 
                     //сохранить матрицу по пути пользователя
                     if (window_Save_Result.isSelectedAddToMatrixList && (last_operation == '+' || last_operation == '-'
-                        || (last_operation == '*' && (last_orientation == 3 || last_orientation == 4))))//если матрица треугольная и выбрана опция добавить в список
+                        || (last_operation == '*' && (last_orientation == 3 || last_orientation == 4)) ))//если матрица треугольная и выбрана опция добавить в список
                     {
                         if (list_matrices.Find(delegate (string str) { return str == window_Save_Result.get_Matrix_name; }) == null)
                         {
@@ -1007,7 +1006,7 @@ namespace Wpf_Matrices
                 }
         }
 
-        private async void Button_Click_Create_Matrix(object sender, RoutedEventArgs e)
+        private  void Button_Click_Create_Matrix(object sender, RoutedEventArgs e)
         {
 
             validate_numericup_down();
