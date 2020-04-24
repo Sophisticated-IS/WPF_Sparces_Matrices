@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Wpf_Matrices
 {
-    public class Sparse_Matrix//А если мне на
+    public class Sparse_Matrix
     {
         //ВСЕ ФУНКЦИИ ДОЛЖНЫ БЫТЬ РЕАЛИЗОВАНЫ В ВИДЕ ПОДПРОГРАММ
         public static double triangular_matrix_not_null_upper_major_diagonal_get_elt(ref List<double> list, int i, int j, double common_elt,int dim)//возвращает элемент верхней главной диагонали матрицы в упакованной форме
@@ -249,7 +249,7 @@ namespace Wpf_Matrices
             }
             return sum;
         }
-        public  List<double> lower_triangular_matrix_secondary_diagonal_with_nulls(List<double> A, List<double> B, int dimension)//САМЫЙ ОТВРАТИТЕЛЬНЫЙ АЛГОРИТМ КОТОРЫЙ ВИДЕЛ СВЕТ
+        public  List<double> lower_triangular_matrix_secondary_diagonal_with_nulls(List<double> A, List<double> B, int dimension)
         {
             List<double> list_result = new List<double>();//TODO: Нужно ли сохрнять результат в отдельный список????? ПАМЯТЬ --
 
