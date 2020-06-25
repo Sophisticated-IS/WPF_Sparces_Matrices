@@ -54,14 +54,12 @@ C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\bin\Debug\Fast_Mat
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\bin\Debug\Gu.Wpf.DataGrid2D.xml
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\bin\Debug\MahApps.Metro.xml
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\bin\Debug\MathNet.Numerics.xml
-C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\Wpf_Matrices.csprojAssemblyReference.cache
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\Window_save_result_matrix.baml
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\App.baml
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\MainWindow.g.cs
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\Window1_pop_up_input_matrix_name.g.cs
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\Window_save_result_matrix.g.cs
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\App.g.cs
-C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\GeneratedInternalTypeHelper.g.cs
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\Fast_Matrix_MarkupCompile.cache
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\Fast_Matrix_MarkupCompile.lref
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices\obj\Debug\MainWindow.baml

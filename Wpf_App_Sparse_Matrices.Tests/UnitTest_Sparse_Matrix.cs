@@ -42,7 +42,7 @@ namespace Wpf_Matrices
             double common_elt = 9.9;
             double expected = 18;
             //act
-            UnitTest_Sparse_Matrix sparse = new Sparse_Matrix();
+            Sparse_Matrix sparse = new Sparse_Matrix();
             double actual = (sparse.triangular_matrix__any_diagonal_not_nulls_multiplication(list1, list2, dim, common_elt, orientation)).First();
 
             //asssert
