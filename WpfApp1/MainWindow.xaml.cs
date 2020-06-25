@@ -492,6 +492,7 @@ namespace Wpf_Matrices
 
         }
         //Math .NET Numerics!!!!!!!
+     
         public void choose_operation_of_M1_and_M2(char operation, string matrix_name1, string matrix_name2, int dim, int orient, double val_typ_elt)//производит выбор функции в зависимости от перации
         {
             Sparse_Matrix sparse_m = new Sparse_Matrix();
@@ -622,8 +623,6 @@ namespace Wpf_Matrices
         //Логически важные методы (Лучше вынести в класс потом )
         private void save_matrix_in_file(string File_path, string message)
         {
-
-
             if ((TabItem_Normal_Form.IsSelected && validate_2Darray(array_inp, dimension, dimension, $"при {message} матрицы в файл  из Матричной формы")) ||
                     (TabItem_Dense_Form.IsSelected && validate_2Darray(array_dense, amount_of_not_null_elts(dimension), 1, $"при {message}  матрицы в файл из Упакованной формы"))) //если в массивах только double числа
                 using (var file = File.CreateText(File_path))

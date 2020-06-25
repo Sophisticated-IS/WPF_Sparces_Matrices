@@ -84,7 +84,11 @@ namespace Wpf_Matrices
             }
 
         }
-
+        //public async Task<List<double>> triangular_matrix_sumAsync(List<double> A,List<double> B)
+        //{
+        // var result =   await Task.Run(() =>triangular_matrix_sum(A, B));
+        // return result;
+        //}
         public  List<double> triangular_matrix_sum(List<double> A, List<double> B)//cумма двух любых матриц
         {
             List<double> list_result = new List<double>();
@@ -105,7 +109,7 @@ namespace Wpf_Matrices
 
             return list_result;
         }
-        public  List<double> triangular_matrix__any_diagonal_not_nulls_multiplication(List<double> A, List<double> B, int dimension,
+        public List<double> triangular_matrix__any_diagonal_not_nulls_multiplication(List<double> A, List<double> B, int dimension,
                                                                                                   double common_element, string orientation)//умножение матриц с ненулевым однотипным элементом
         {
             //Виды ориентаций up_major,low_major,up_secondary,low_secondary
@@ -283,7 +287,7 @@ namespace Wpf_Matrices
 
                     if (ctr < i)
                     {
-                        b = b - offset;
+                        b -= offset;
                         offset--;
                         ctr++;
                         counter++;

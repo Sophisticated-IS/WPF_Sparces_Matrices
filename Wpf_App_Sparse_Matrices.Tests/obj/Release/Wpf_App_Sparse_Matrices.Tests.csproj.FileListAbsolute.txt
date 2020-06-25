@@ -1,0 +1,16 @@
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Wpf_App_Sparse_Matrices.Tests.dll
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Wpf_App_Sparse_Matrices.Tests.pdb
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.dll
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.xml
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\obj\Release\Wpf_App_Sparse_Matrices.Tests.csprojAssemblyReference.cache
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\obj\Release\Wpf_App_Sparse_Matrices.Tests.csproj.CopyComplete
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\obj\Release\Wpf_App_Sparse_Matrices.Tests.dll
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\obj\Release\Wpf_App_Sparse_Matrices.Tests.pdb
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Fast_Matrix.exe
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Fast_Matrix.pdb
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Release\Fast_Matrix.exe.config

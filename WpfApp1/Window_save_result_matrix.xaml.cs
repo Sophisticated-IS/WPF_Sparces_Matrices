@@ -75,8 +75,7 @@ namespace WpfApp1
                 {
                     if (!(string.IsNullOrWhiteSpace(Text_Box_Path.Text) || string.IsNullOrEmpty(Text_Box_Path.Text)))
                     {
-                        string path_without_name = "";
-                        path_without_name =Text_Box_Path.Text.Remove(Text_Box_Path.Text.LastIndexOf('\\') +1);
+                        string path_without_name = Text_Box_Path.Text.Remove(Text_Box_Path.Text.LastIndexOf('\\') + 1);
                         Text_Box_Path.Text = path_without_name + Text_Box_Matrix_name.Text +e.Text[0] + ".txt";
                     }
                     else
