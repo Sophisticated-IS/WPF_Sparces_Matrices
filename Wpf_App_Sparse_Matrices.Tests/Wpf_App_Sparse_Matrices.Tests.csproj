@@ -53,14 +53,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="UnitTest_Sparse_Matrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WpfApp1\Wpf_Matrices.csproj">
+    <ProjectReference Include="..\Wpf_App_Sparse_Matrices\Wpf_Matrices.csproj">
       <Project>{1e3ff353-5e5d-4019-ae0b-166a4554c41f}</Project>
       <Name>Wpf_Matrices</Name>
     </ProjectReference>

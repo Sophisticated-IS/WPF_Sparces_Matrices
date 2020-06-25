@@ -11,3 +11,7 @@ C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\obj\Debug\Wp
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\obj\Debug\Wpf_App_Sparse_Matrices.Tests.csproj.CopyComplete
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\obj\Debug\Wpf_App_Sparse_Matrices.Tests.dll
 C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\obj\Debug\Wpf_App_Sparse_Matrices.Tests.pdb
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Debug\Fast_Matrix.exe
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Debug\DataGrid2DLibrary.dll
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Debug\Fast_Matrix.pdb
+C:\Users\Sova IS\source\repos\WpfApp1\Wpf_App_Sparse_Matrices.Tests\bin\Debug\Fast_Matrix.exe.config
