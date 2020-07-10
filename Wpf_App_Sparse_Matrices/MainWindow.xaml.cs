@@ -920,10 +920,6 @@ namespace Wpf_Matrices
                                 }
                                 else//если в файле матрица квадратная
                                 {
-                                    //TODO: ДОБАВИТЬ ПРОВЕРКУ НА ОРИЕНТАЦИя но ОНА будет много жрать ЦП так как проверить нужно все элементы 
-                                    //все в порядке то добавим в список и надо ли считывать?
-                                    //MessageBox.Show("Матрица в файле валидна");
-                                    //cancel_handle_norm_form = true;
                                     TabItem_Dense_Form.IsSelected = true;
 
                                     using (var file2 = new StreamReader(dlg.FileName))//второй раз открываю файл чтобы уже считать,так как он был проверен
@@ -1036,7 +1032,7 @@ namespace Wpf_Matrices
                         Label_Matrix_Name.Text = "НЕСОХРАНЕННАЯ МАТРИЦА";
                         MessageBox.Show("Матрица создана успешно!");
                     }
-                    //TODO:
+
                     if (messageBoxResult == MessageBoxResult.Yes)
                     {
                         dimension = tmp_heavy_dim;//если пользователь согласился только тогда меняем размерность
@@ -1374,7 +1370,7 @@ namespace Wpf_Matrices
             }
             else
             {
-                string Matrix_name = Matrix_name_pop_up.get_Matrix_name;//TODO: ДОБАВИТЬ ВАЛИДАЦИЮ
+                string Matrix_name = Matrix_name_pop_up.get_Matrix_name;
                 if (string.IsNullOrEmpty(Matrix_name))
                 {
                     MessageBox.Show("Имя матрицы не может быть пустым!");
@@ -1499,7 +1495,6 @@ namespace Wpf_Matrices
                             Image_OR.Source = orientations[index_image];
                             textBox_typical_elt.Text = typical_elt.ToString();
 
-                            //TODO : ТЕСТЫ НУЖНЫ ВЫНЕСТИ КУСОК КОДА НИЖЕ в отдельную функция так как 2 раза повторяется
                             read_matrix_from_file(file);
                             dataGrid2D_sec_page.ItemsSource2D = array_dense;
                             Label_Matrix_Name.Text = List_Matrices.SelectedItem.ToString();
@@ -1522,7 +1517,6 @@ namespace Wpf_Matrices
                         Image_OR.Source = orientations[index_image];
                         textBox_typical_elt.Text = typical_elt.ToString();
 
-                        //TODO : ТЕСТЫ НУЖНЫ ВЫНЕСТИ КУСОК КОДА НИЖЕ в отдельную функция так как 2 раза повторяется
                         read_matrix_from_file(file);
                         dataGrid2D_sec_page.ItemsSource2D = array_dense;
                         Label_Matrix_Name.Text = List_Matrices.SelectedItem.ToString();
@@ -1634,7 +1628,7 @@ namespace Wpf_Matrices
 
         private void comboBox_name_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!(comboBox_name.SelectedItem is null) && comboBox_name.SelectedItem.ToString() != "System.Windows.Controls.ComboBoxItem: Название")//TODO: ЕБУЧИЙ КОСТЫЛЬ ТАК КАК ЕСЛИ ПОЛЬЗОВАТЕЛЬ ВВЕДЕТ НАЗВАНИЕ КАК В ПРОВЕРКЕ, ТО ОН НЕ СМОЖЕТ С НЕЙ РАБОТАТЬ
+            if (!(comboBox_name.SelectedItem is null) && comboBox_name.SelectedItem.ToString() != "System.Windows.Controls.ComboBoxItem: Название")
             {
 
                 using (var file = new StreamReader(path_to_FS + comboBox_name.SelectedItem.ToString() + ".txt"))
@@ -1818,10 +1812,6 @@ namespace Wpf_Matrices
                                         MessageBox.Show($"Матрицы с именем \"{matrix_1}\" не существует", "Не удалось найти матрицу");
                                     }
 
-
-
-                                    //1 проверить обе матрицы сущ-ют у них одинакова размерность и ориентация и однотип эл-нт
-                                    //TODO: //все хорошо
                                 }
                                 else
                                 {
@@ -1850,19 +1840,6 @@ namespace Wpf_Matrices
 
         private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //TODO : ОЧЕНЬ СТРАННОЕ ПОВЕДЕНИЕ КОДА
-            //ПРИ ДЕБАГЕ ДИРЕКТОРИЯ УДАЛЯЕТСЯ НО ПРИ ЗАПУСКЕ В РЕЛИЗЕ КОД НЕ УДАЛЯЕТ УЖЕ СУЩЕСТВУЮЩУЮ ДИРЕКТОРИЮ 
-            //это хренова мистика 
-            //Ошибка возникает только в студии
-            try
-            {
-
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
             if (Directory.Exists($@"{Directory.GetCurrentDirectory()}\Матрицы"))
             {
                 Directory.Delete($@"{Directory.GetCurrentDirectory()}\Матрицы", true);
